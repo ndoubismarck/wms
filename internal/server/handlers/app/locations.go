@@ -36,6 +36,11 @@ type (
 		apiResponseBody
 		Data locations.GetAislesResultPayload `json:"data"`
 	}
+	getLocationNextAisleCodeRequestBody  locations.GetNextAisleCodeData
+	getLocationNextAisleCodeResponseBody struct {
+		apiResponseBody
+		Data locations.GetNextCodeResultPayload `json:"data"`
+	}
 )
 
 type (
@@ -60,6 +65,11 @@ type (
 	getLocationBaysResponseBody struct {
 		apiResponseBody
 		Data locations.GetBaysResultPayload `json:"data"`
+	}
+	getLocationNextBayCodeRequestBody  locations.GetNextBayCodeData
+	getLocationNextBayCodeResponseBody struct {
+		apiResponseBody
+		Data locations.GetNextCodeResultPayload `json:"data"`
 	}
 )
 
@@ -86,6 +96,11 @@ type (
 		apiResponseBody
 		Data locations.GetShelvesResultPayload `json:"data"`
 	}
+	getLocationNextShelfCodeRequestBody  locations.GetNextShelfCodeData
+	getLocationNextShelfCodeResponseBody struct {
+		apiResponseBody
+		Data locations.GetNextCodeResultPayload `json:"data"`
+	}
 )
 
 type (
@@ -111,6 +126,11 @@ type (
 		apiResponseBody
 		Data locations.GetShelfLevelsResultPayload `json:"data"`
 	}
+	getLocationNextShelfLevelCodeRequestBody  locations.GetNextShelfLevelCodeData
+	getLocationNextShelfLevelCodeResponseBody struct {
+		apiResponseBody
+		Data locations.GetNextCodeResultPayload `json:"data"`
+	}
 )
 
 type (
@@ -135,6 +155,11 @@ type (
 	getLocationBinsResponseBody struct {
 		apiResponseBody
 		Data locations.GetBinsResultPayload `json:"data"`
+	}
+	getLocationNextBinCodeRequestBody  locations.GetNextBinCodeData
+	getLocationNextBinCodeResponseBody struct {
+		apiResponseBody
+		Data locations.GetNextCodeResultPayload `json:"data"`
 	}
 )
 
@@ -309,6 +334,38 @@ func (h *handler) getLocationAisles(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, responseBody)
 }
 
+func (h *handler) getLocationNextAisleCode(context *gin.Context) {
+	var (
+		requestBody  getLocationNextAisleCodeRequestBody
+		responseBody getLocationNextAisleCodeResponseBody
+	)
+	if err := context.BindQuery(&requestBody); err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	requestBody.LocationID = context.Param("lid")
+	result, err := h.services.Locations().GetNextAisleCode(locations.GetNextAisleCodeData(requestBody))
+	if err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	if result.Code != types.ServiceResultCodeSuccess {
+		responseBody.Code = result.Code
+		if result.Code == types.ServiceResultCodeInvalid {
+			responseBody.Validation = result.Validation
+		}
+		context.IndentedJSON(http.StatusForbidden, responseBody)
+		return
+	}
+	responseBody.Code = result.Code
+	responseBody.Data = result.Payload
+	context.IndentedJSON(http.StatusOK, responseBody)
+}
+
 func (h *handler) addLocationBay(context *gin.Context) {
 	var (
 		requestBody  addLocationBayRequestBody
@@ -448,6 +505,38 @@ func (h *handler) getLocationBays(context *gin.Context) {
 	responseBody.Code = result.Code
 	responseBody.Data = result.Payload
 	responseBody.Pagination = result.Pagination
+	context.IndentedJSON(http.StatusOK, responseBody)
+}
+
+func (h *handler) getLocationNextBayCode(context *gin.Context) {
+	var (
+		requestBody  getLocationNextBayCodeRequestBody
+		responseBody getLocationNextBayCodeResponseBody
+	)
+	if err := context.BindQuery(&requestBody); err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	requestBody.LocationID = context.Param("lid")
+	result, err := h.services.Locations().GetNextBayCode(locations.GetNextBayCodeData(requestBody))
+	if err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	if result.Code != types.ServiceResultCodeSuccess {
+		responseBody.Code = result.Code
+		if result.Code == types.ServiceResultCodeInvalid {
+			responseBody.Validation = result.Validation
+		}
+		context.IndentedJSON(http.StatusForbidden, responseBody)
+		return
+	}
+	responseBody.Code = result.Code
+	responseBody.Data = result.Payload
 	context.IndentedJSON(http.StatusOK, responseBody)
 }
 
@@ -593,6 +682,38 @@ func (h *handler) getLocationShelves(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, responseBody)
 }
 
+func (h *handler) getLocationNextShelfCode(context *gin.Context) {
+	var (
+		requestBody  getLocationNextShelfCodeRequestBody
+		responseBody getLocationNextShelfCodeResponseBody
+	)
+	if err := context.BindQuery(&requestBody); err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	requestBody.LocationID = context.Param("lid")
+	result, err := h.services.Locations().GetNextShelfCode(locations.GetNextShelfCodeData(requestBody))
+	if err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	if result.Code != types.ServiceResultCodeSuccess {
+		responseBody.Code = result.Code
+		if result.Code == types.ServiceResultCodeInvalid {
+			responseBody.Validation = result.Validation
+		}
+		context.IndentedJSON(http.StatusForbidden, responseBody)
+		return
+	}
+	responseBody.Code = result.Code
+	responseBody.Data = result.Payload
+	context.IndentedJSON(http.StatusOK, responseBody)
+}
+
 func (h *handler) addLocationShelfLevel(context *gin.Context) {
 	var (
 		requestBody  addLocationShelfLevelRequestBody
@@ -735,6 +856,38 @@ func (h *handler) getLocationShelfLevels(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, responseBody)
 }
 
+func (h *handler) getLocationNextShelfLevelCode(context *gin.Context) {
+	var (
+		requestBody  getLocationNextShelfLevelCodeRequestBody
+		responseBody getLocationNextShelfLevelCodeResponseBody
+	)
+	if err := context.BindQuery(&requestBody); err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	requestBody.LocationID = context.Param("lid")
+	result, err := h.services.Locations().GetNextShelfLevelCode(locations.GetNextShelfLevelCodeData(requestBody))
+	if err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	if result.Code != types.ServiceResultCodeSuccess {
+		responseBody.Code = result.Code
+		if result.Code == types.ServiceResultCodeInvalid {
+			responseBody.Validation = result.Validation
+		}
+		context.IndentedJSON(http.StatusForbidden, responseBody)
+		return
+	}
+	responseBody.Code = result.Code
+	responseBody.Data = result.Payload
+	context.IndentedJSON(http.StatusOK, responseBody)
+}
+
 func (h *handler) addLocationBin(context *gin.Context) {
 	var (
 		requestBody  addLocationBinRequestBody
@@ -874,5 +1027,37 @@ func (h *handler) getLocationBins(context *gin.Context) {
 	responseBody.Code = result.Code
 	responseBody.Data = result.Payload
 	responseBody.Pagination = result.Pagination
+	context.IndentedJSON(http.StatusOK, responseBody)
+}
+
+func (h *handler) getLocationNextBinCode(context *gin.Context) {
+	var (
+		requestBody  getLocationNextBinCodeRequestBody
+		responseBody getLocationNextBinCodeResponseBody
+	)
+	if err := context.BindQuery(&requestBody); err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	requestBody.LocationID = context.Param("lid")
+	result, err := h.services.Locations().GetNextBinCode(locations.GetNextBinCodeData(requestBody))
+	if err != nil {
+		responseBody.Code = types.ServiceResultCodeInternal
+		context.IndentedJSON(http.StatusInternalServerError, responseBody)
+		h.ctx.Logger().Error(err)
+		return
+	}
+	if result.Code != types.ServiceResultCodeSuccess {
+		responseBody.Code = result.Code
+		if result.Code == types.ServiceResultCodeInvalid {
+			responseBody.Validation = result.Validation
+		}
+		context.IndentedJSON(http.StatusForbidden, responseBody)
+		return
+	}
+	responseBody.Code = result.Code
+	responseBody.Data = result.Payload
 	context.IndentedJSON(http.StatusOK, responseBody)
 }

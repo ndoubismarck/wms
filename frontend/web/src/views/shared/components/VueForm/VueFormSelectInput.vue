@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {computed, onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
-import VueSelect from 'vue3-select-component'
 import {ErrorMessage as VeeErrorMessage, Field as VeeField, type RuleExpression} from 'vee-validate'
-import {useApp} from '@/app/app'
+import {useApp} from '@/app/app.ts'
 
 export interface ISelectInputOption {
   label: string
@@ -10,176 +9,283 @@ export interface ISelectInputOption {
   selected?: boolean
 }
 
+const app = useApp()
+
 const props = defineProps<{
   name: string
-  label?: string
+  label: string
   value?: number | string
-  isMulti?: boolean
   options: ISelectInputOption[]
-  isLoading?: boolean
   disabled?: boolean
   validation?: RuleExpression<any>
-  placeholder?: string
+  placeholder: string
 }>()
 
-const app = useApp()
-const emits = defineEmits(['change', 'search'])
-
-const model = ref<any>()
-const fields = ref<(typeof VeeField)[]>()
+const emits = defineEmits<{
+  (e: 'change', option?: ISelectInputOption): void
+  (e: 'search', query: string): void
+}>()
 
 const value = toRef(props, 'value')
 const options = toRef(props, 'options')
-const selectOptions = computed(() => options.value as any[])
+const validation = toRef(props, 'validation')
 
-const loadOptions = () => {
-  options.value.forEach((item) => {
-    if (item.selected) {
-      model.value = item.value
-    }
-  })
+const query = ref('')
+const model = ref<any>()
+const isOpen = ref(false)
+const rootEl = ref<HTMLElement | null>(null)
+const inputEl = ref<HTMLInputElement | null>(null)
+const emittedEmpty = ref(false)
 
-  const index = options.value.findIndex((item) => item.value == model.value)
-  if (index < 0) {
-    model.value = undefined
+const selectedOption = computed(() => {
+  if (model.value === null || model.value === undefined) {
+    return null
   }
-}
+  return options.value.find((o) => o.value === model.value) ?? null
+})
 
-const emitSelectedOption = () => {
-  const selectedOption = options.value.find((item) => item && item.value == model.value)
-  emits('change', selectedOption)
-  if (!selectedOption) {
-    model.value = null
+const visibleOptions = computed(() => {
+  const q = query.value.trim().toLowerCase()
+  if (!q) {
+    return options.value
   }
-}
+  const selectedLabel = (selectedOption.value?.label ?? '').trim().toLowerCase()
+  if (selectedOption.value && q === selectedLabel) {
+    return options.value
+  }
+  return options.value.filter((o) => (o.label ?? '').toLowerCase().includes(q))
+})
 
-const emitSearch = (value: string) => {
-  emits('search', value)
+const isOptionSelected = (opt: ISelectInputOption) => {
+  return model.value !== null && model.value !== undefined && opt.value === model.value
 }
 
 watch(
   options,
   () => {
-    if (options.value.length == 0) {
-      model.value = undefined
-      return
-    }
     loadOptions()
   },
   {deep: true},
 )
 
-watch(model, () => {
-  emitSelectedOption()
-})
+watch(
+  selectedOption,
+  (opt) => {
+    if (!opt) {
+      if (model.value !== null && model.value !== undefined) {
+        model.value = undefined
+        query.value = ''
+        emitEmptyOption()
+      }
+      return
+    }
+    emittedEmpty.value = false
+    query.value = opt.label ?? ''
+  },
+  {immediate: true},
+)
+
+watch(
+  value,
+  (next) => {
+    if (next === null || next === undefined) {
+      if (model.value !== null && model.value !== undefined) {
+        clearSelection()
+      }
+      return
+    }
+    emittedEmpty.value = false
+    model.value = next
+  },
+  {immediate: true},
+)
+
+const close = () => {
+  isOpen.value = false
+}
+
+const loadOptions = () => {
+  if (options.value.length == 0) {
+    if (model.value !== null && model.value !== undefined) {
+      model.value = undefined
+      query.value = ''
+      emitEmptyOption()
+    }
+    return
+  }
+
+  const selected = options.value.find((item) => item.selected)
+  if (selected) {
+    model.value = selected.value
+    query.value = selected.label ?? ''
+    emittedEmpty.value = false
+    return
+  }
+
+  if (model.value !== null && model.value !== undefined) {
+    const index = options.value.findIndex((item) => item.value == model.value)
+    if (index < 0) {
+      model.value = undefined
+      query.value = ''
+      emitEmptyOption()
+    }
+  }
+}
+
+const clearSelection = () => {
+  const hadSelection = model.value !== null && model.value !== undefined
+  const hadQuery = query.value.trim().length > 0
+  model.value = undefined
+  query.value = ''
+  if (hadSelection || hadQuery) {
+    emitEmptyOption()
+  }
+}
+
+const emitEmptyOption = () => {
+  if (emittedEmpty.value) {
+    return
+  }
+  emittedEmpty.value = true
+  emits('change', undefined)
+}
+
+const emitSelectedOption = (opt: ISelectInputOption) => {
+  emittedEmpty.value = false
+  emits('change', opt)
+}
+
+const handleClose = (evt: Event) => {
+  evt.preventDefault()
+  close()
+}
+
+const handleFocus = (evt: Event, touchedCallback: (isTouched: boolean) => void) => {
+  evt.preventDefault()
+  isOpen.value = true
+  touchedCallback(true)
+}
+
+const handleInputClick = (touchedCallback: (isTouched: boolean) => void) => {
+  isOpen.value = true
+  touchedCallback(true)
+}
+
+const handleOnBlur = (evt: Event, touchedCallback: (isTouched: boolean) => void) => {
+  evt.preventDefault()
+  touchedCallback(true)
+}
+
+const handleSelect = (evt: Event, opt: ISelectInputOption, touchedCallback: (isTouched: boolean) => void) => {
+  evt.preventDefault()
+  touchedCallback(true)
+  query.value = opt.label ?? ''
+  model.value = opt.value
+  emitSelectedOption(opt)
+  close()
+}
+
+const handleOnInput = (evt: Event, touchedCallback: (isTouched: boolean) => void) => {
+  evt.preventDefault()
+  touchedCallback(true)
+  isOpen.value = true
+  const target = evt.target as HTMLInputElement
+  if (!target) {
+    return
+  }
+
+  const searchValue = target.value.trim()
+  if (!searchValue) {
+    clearSelection()
+    return
+  }
+
+  if (model.value !== null && model.value !== undefined) {
+    model.value = undefined
+    emitEmptyOption()
+  }
+
+  if (searchValue.length >= 3) {
+    emits('search', searchValue)
+  }
+}
+
+const handleDocMouseDown = (e: MouseEvent) => {
+  const target = e.target as Node | null
+  if (!target) {
+    return
+  }
+  if (!rootEl.value?.contains(target)) {
+    close()
+  }
+}
+
+const handleFocusFirstVisible = (evt: Event) => {
+  evt.preventDefault()
+  if (!isOpen.value) {
+    isOpen.value = true
+  }
+  const first = rootEl.value?.querySelector<HTMLButtonElement>('.dropdown-item')
+  first?.focus()
+}
 
 onMounted(() => {
-  loadOptions()
-  if (value.value != null) {
-    model.value = value.value
-  }
+  document.addEventListener('mousedown', handleDocMouseDown)
 })
 
 onBeforeUnmount(() => {
-  fields.value = []
+  document.removeEventListener('mousedown', handleDocMouseDown)
 })
+
 </script>
 
 <template>
-  <div class="w-100">
-    <div class="form-floating d-flex">
-      <vee-field ref="fields" v-slot="{ field }" v-model="model" :name="name" :rules="validation">
+  <div ref="rootEl" class="w-100">
+    <vee-field v-slot="{ field, meta, setTouched }" :name="name" :rules="validation"
+               v-model="model">
+      <div class="position-relative d-flex w-100">
         <slot name="addon-start"/>
-        <vue-select
-          v-bind="field"
-          v-model="model"
-          :is-multi="isMulti"
-          :options="selectOptions"
-          :is-loading="isLoading"
-          :is-disabled="disabled"
-          @search="emitSearch"
-          :classes="{control:'form-control'}"
-          :placeholder="placeholder ? placeholder : 'Select an option'"/>
+        <div class="w-100">
+          <div class="form-control-fi w-100">
+            <input
+              ref="inputEl"
+              type="text"
+              class="form-control"
+              :disabled="disabled"
+              :placeholder="placeholder"
+              v-model="query"
+              :class="{ 'is-invalid': !disabled && options.length >0 &&  meta.touched && meta.validated && !meta.valid }"
+              @blur="handleOnBlur($event, setTouched)"
+              @focus="handleFocus($event, setTouched)"
+              @click="handleInputClick(setTouched)"
+              @input="handleOnInput($event, setTouched)"
+              @keydown.down.prevent="handleFocusFirstVisible"
+              @keydown.esc.prevent="handleClose($event)"
+            />
+            <label>{{ label }}</label>
+            <input v-bind="field" type="hidden"/>
+          </div>
+          <ul class="dropdown-menu w-100" :class="{ show: isOpen }"
+              style="max-height: 260px; overflow: auto">
+            <li v-if="visibleOptions.length === 0">
+              <span class="dropdown-item-text text-muted">No results</span>
+            </li>
+
+            <li v-for="opt in visibleOptions" :key="opt.value">
+              <button type="button" class="dropdown-item" :class="{ active: isOptionSelected(opt) }"
+                      @mousedown.prevent="handleSelect($event, opt, setTouched)">
+                {{ opt.label }}
+              </button>
+            </li>
+          </ul>
+        </div>
         <slot name="addon-end"/>
-      </vee-field>
-    </div>
-    <vee-error-message v-slot="{ message }" :name="name">
-      <p class="invalid-feedback d-block p-0 m-0">
+      </div>
+      <vee-error-message v-slot="{ message }" :name="name">
+      <span v-if="!disabled && options.length > 0" class="invalid-feedback d-block p-0 m-0">
         {{ app.helpers.veeValidate.errorMessage(message) }}
-      </p>
-    </vee-error-message>
+      </span>
+      </vee-error-message>
+    </vee-field>
   </div>
 </template>
-<style>
-:root {
-  --vs-width: 100%;
-  --vs-min-height: 58px;
-  --vs-padding: 10px 8px;
-  --vs-border: 1px solid #e4e4e7;
-  --vs-border-radius: 4px;
-  --vs-font-size: 16px;
-  --vs-font-weight: 400;
-  --vs-font-family: inherit;
-  --vs-text-color: #18181b;
-  --vs-line-height: 1.5;
-  --vs-placeholder-color: #52525b;
-  --vs-background-color: #fff;
-  --vs-disabled-background-color: #f4f4f5;
-  --vs-outline-width: 1px;
-  --vs-outline-color: v-bind(--bs-primary);
-
-  --vs-menu-offset-top: 8px;
-  --vs-menu-height: 200px;
-  --vs-menu-border: var(--vs-border);
-  --vs-menu-background-color: var(--vs-background-color);
-  --vs-menu-box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --vs-menu-z-index: 2;
-
-  --vs-option-width: 100%;
-  --vs-option-padding: 8px 12px;
-  --vs-option-cursor: pointer;
-  --vs-option-font-size: var(--vs-font-size);
-  --vs-option-font-weight: var(--vs-font-weight);
-  --vs-option-text-align: -webkit-auto;
-  --vs-option-text-color: var(--vs-text-color);
-  --vs-option-hover-text-color: var(--vs-text-color);
-  --vs-option-focused-text-color: var(--vs-text-color);
-  --vs-option-selected-text-color: var(--vs-text-color);
-  --vs-option-disabled-text-color: #52525b;
-  --vs-option-background-color: var(--vs-menu-background);
-  --vs-option-hover-background-color: #dbeafe;
-  --vs-option-focused-background-color: #dbeafe;
-  --vs-option-selected-background-color: #93c5fd;
-  --vs-option-disabled-background-color: #f4f4f5;
-  --vs-option-opacity-menu-open: 0.4;
-
-  --vs-multi-value-margin: 2px;
-  --vs-multi-value-border: 0px;
-  --vs-multi-value-border-radius: 2px;
-  --vs-multi-value-background-color: #f4f4f5;
-
-  --vs-multi-value-label-padding: 4px 4px 4px 8px;
-  --vs-multi-value-label-font-size: 12px;
-  --vs-multi-value-label-font-weight: 400;
-  --vs-multi-value-label-line-height: 1;
-  --vs-multi-value-label-text-color: #3f3f46;
-
-  --vs-multi-value-delete-padding: 0 3px;
-  --vs-multi-value-delete-hover-background-color: #FF6467;
-  --vs-multi-value-xmark-size: 16px;
-  --vs-multi-value-xmark-cursor: pointer;
-  --vs-multi-value-xmark-color: var(--vs-multi-value-label-text-color);
-  --vs-multi-value-xmark-hover-color: #fff;
-
-  --vs-indicators-gap: 0px;
-  --vs-indicator-icon-size: 20px;
-  --vs-indicator-icon-color: var(--vs-text-color);
-  --vs-indicator-icon-cursor: pointer;
-  --vs-indicator-dropdown-icon-transition: transform 0.2s ease-out;
-
-  --vs-spinner-color: var(--vs-text-color);
-  --vs-spinner-size: 16px;
-}
-
-
-</style>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useProductsStore } from '@/stores/products_store.ts'
-import Breadcrumb from '@/views/shared/components/Breadcrumb.vue'
 import VueTable, { type ITableColumn } from '@/views/shared/components/VueTable.vue'
 import { useApp } from '@/app/app.ts'
 import Preloader from '@/views/shared/components/Preloader.vue'
@@ -115,71 +114,69 @@ onMounted(async () => {
 </script>
 
 <template>
-  <breadcrumb>
-    <div class="card">
-      <template v-if="isLoading">
-        <div class="card-body position-relative h-px-300">
-          <preloader :overlay="true" />
-        </div>
-      </template>
-      <template v-else>
-        <div class="card-header d-flex justify-content-start">
+  <div class="card">
+    <template v-if="isLoading">
+      <div class="card-body position-relative h-px-300">
+        <preloader :overlay="true" />
+      </div>
+    </template>
+    <template v-else>
+      <div class="card-header d-flex justify-content-start">
+        <button
+          style="height: 40px !important"
+          @click="router.push({ name: 'admin:inventory:products:add' })"
+          class="btn btn-outline-primary d-flex justify-content-center">
+          <i class="bx bx-plus" />
+          <span class="d-none d-sm-inline ms-2">Add Product</span>
+        </button>
+        <div class="dropdown ms-4">
           <button
             style="height: 40px !important"
-            @click="router.push({ name: 'admin:inventory:products:add' })"
-            class="btn btn-outline-primary d-flex justify-content-center">
-            <i class="bx bx-plus" />
-            <span class="d-none d-sm-inline ms-2">Add Product</span>
+            class="btn btn-outline-primary d-flex justify-content-center"
+            data-bs-toggle="dropdown"
+            data-bs-boundary="viewport"
+            aria-expanded="false"
+            :disabled="checkedProductIds.length == 0">
+            <span class="d-none d-sm-inline me-2">With Selected</span>
+            <i class="bx bx-chevron-down" />
           </button>
-          <div class="dropdown ms-4">
-            <button
-              style="height: 40px !important"
-              class="btn btn-outline-primary d-flex justify-content-center"
-              data-bs-toggle="dropdown"
-              data-bs-boundary="viewport"
-              aria-expanded="false"
-              :disabled="checkedProductIds.length == 0">
-              <span class="d-none d-sm-inline me-2">With Selected</span>
-              <i class="bx bx-chevron-down" />
-            </button>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="#" class="dropdown-item text-primary">
-                  <div class="d-flex justify-content-start"><i class="bx bx-download me-2"></i><span>Export</span></div>
-                </a>
-              </li>
-              <li>
-                <a href="#" class="dropdown-item text-danger">
-                  <div class="d-flex justify-content-start"><i class="bx bx-trash me-2"></i><span>Delete</span></div>
-                </a>
-              </li>
-            </ul>
-          </div>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="#" class="dropdown-item text-primary">
+                <div class="d-flex justify-content-start"><i class="bx bx-download me-2"></i><span>Export</span></div>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-item text-danger">
+                <div class="d-flex justify-content-start"><i class="bx bx-trash me-2"></i><span>Delete</span></div>
+              </a>
+            </li>
+          </ul>
         </div>
+      </div>
 
-        <div class="card-body p-0" style="min-height: 300px">
-          <vue-table
-            :rows="products"
-            :columns="getTableColumns"
-            @checked="handleTabledChecked"
-            @scrollend="handleTableScrollEnd"
-            :checkboxes="true">
-            <template #actions="{ row }">
-              <router-link
-                :to="{ name: 'admin:inventory:products:view', params: { id: row.id } }"
-                class="btn btn-lg text-primary border-0">
-                <i class="bx bx-dots-vertical"></i>
-              </router-link>
-            </template>
-            <template #preloader>
-              <div v-if="isFetching" class="position-relative h-auto py-6 my-6">
-                <preloader :overlay="true" />
-              </div>
-            </template>
-          </vue-table>
-        </div>
-      </template>
-    </div>
-  </breadcrumb>
+      <div class="card-body p-0" style="min-height: 300px">
+        <vue-table
+          :rows="products"
+          :columns="getTableColumns"
+          @checked="handleTabledChecked"
+          @scrollend="handleTableScrollEnd"
+          :checkboxes="true">
+          <template #actions="{ row }">
+            <router-link
+              :to="{ name: 'admin:inventory:products:view', params: { id: row.id } }"
+              class="btn btn-lg text-primary border-0">
+              <i class="bx bx-dots-vertical"></i>
+            </router-link>
+          </template>
+          <template #preloader>
+            <div v-if="isFetching" class="position-relative h-auto py-6 my-6">
+              <preloader :overlay="true" />
+            </div>
+          </template>
+        </vue-table>
+      </div>
+    </template>
+  </div>
   <router-view />
 </template>

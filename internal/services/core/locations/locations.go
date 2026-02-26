@@ -5,7 +5,10 @@ import (
 	"server/internal/core/shared/types"
 	"server/internal/data/entities"
 	"server/internal/services/providers"
+	"server/internal/services/providers/database"
 	"server/internal/services/providers/database/queries"
+	"strconv"
+	"strings"
 )
 
 type Service struct {
@@ -21,6 +24,86 @@ func New(ctx types.IContext, providers *providers.Providers) *Service {
 		ctx:       ctx,
 		providers: providers,
 	}
+}
+
+func formatLocationCode(value int) string {
+	if value < 10 {
+		return "0" + strconv.Itoa(value)
+	}
+	return strconv.Itoa(value)
+}
+
+func parseLocationCode(value string) int {
+	trimmed := strings.TrimSpace(value)
+	if trimmed == "" {
+		return 0
+	}
+	parsed, err := strconv.Atoi(trimmed)
+	if err != nil || parsed < 0 {
+		return 0
+	}
+	return parsed
+}
+
+func getNextLocationCode(values []string) string {
+	maxCode := 0
+	for _, value := range values {
+		parsed := parseLocationCode(value)
+		if parsed > maxCode {
+			maxCode = parsed
+		}
+	}
+	return formatLocationCode(maxCode + 1)
+}
+
+func (s *Service) nextAisleCode(query *database.Query, locationID string) (string, error) {
+	codes, err := query.LocationAisles().FindCodes(queries.LocationAislesParams{
+		LocationID: &locationID,
+	})
+	if err != nil {
+		return "", err
+	}
+	return getNextLocationCode(codes), nil
+}
+
+func (s *Service) nextBayCode(query *database.Query, aisleID string) (string, error) {
+	codes, err := query.LocationBays().FindCodes(queries.LocationBaysParams{
+		AisleID: &aisleID,
+	})
+	if err != nil {
+		return "", err
+	}
+	return getNextLocationCode(codes), nil
+}
+
+func (s *Service) nextShelfCode(query *database.Query, bayID string) (string, error) {
+	codes, err := query.LocationShelves().FindCodes(queries.LocationShelvesParams{
+		BayID: &bayID,
+	})
+	if err != nil {
+		return "", err
+	}
+	return getNextLocationCode(codes), nil
+}
+
+func (s *Service) nextShelfLevelCode(query *database.Query, shelfID string) (string, error) {
+	codes, err := query.LocationShelfLevels().FindCodes(queries.LocationShelfLevelsParams{
+		ShelfID: &shelfID,
+	})
+	if err != nil {
+		return "", err
+	}
+	return getNextLocationCode(codes), nil
+}
+
+func (s *Service) nextBinCode(query *database.Query, shelfLevelID string) (string, error) {
+	codes, err := query.LocationBins().FindCodes(queries.LocationBinsParams{
+		ShelfLevelID: &shelfLevelID,
+	})
+	if err != nil {
+		return "", err
+	}
+	return getNextLocationCode(codes), nil
 }
 
 func (s *Service) GetLocations(data GetLocationsData) (*GetLocationsResult, error) {
@@ -72,9 +155,13 @@ func (s *Service) AddAisle(data AddAisleData) (*AddAisleResult, error) {
 	if !parentExists {
 		return &AddAisleResult{Code: types.ServiceResultCodeNotFound}, nil
 	}
+	nextCode, err := s.nextAisleCode(query, data.LocationID)
+	if err != nil {
+		return nil, err
+	}
 	result, err := query.LocationAisles().Create(entities.LocationAisle{
 		LocationID:  data.LocationID,
-		Code:        data.Code,
+		Code:        nextCode,
 		Name:        data.Name,
 		Description: data.Description,
 	})
@@ -249,8 +336,12 @@ func (s *Service) AddBay(data AddBayData) (*AddBayResult, error) {
 	if !parentExists {
 		return &AddBayResult{Code: types.ServiceResultCodeNotFound}, nil
 	}
+	nextCode, err := s.nextBayCode(query, data.AisleID)
+	if err != nil {
+		return nil, err
+	}
 	result, err := query.LocationBays().Create(entities.LocationBay{
-		Code:        data.Code,
+		Code:        nextCode,
 		Name:        data.Name,
 		AisleID:     data.AisleID,
 		Description: data.Description,
@@ -428,8 +519,12 @@ func (s *Service) AddShelf(data AddShelfData) (*AddShelfResult, error) {
 	if !parentExists {
 		return &AddShelfResult{Code: types.ServiceResultCodeNotFound}, nil
 	}
+	nextCode, err := s.nextShelfCode(query, data.BayID)
+	if err != nil {
+		return nil, err
+	}
 	result, err := query.LocationShelves().Create(entities.LocationShelf{
-		Code:        data.Code,
+		Code:        nextCode,
 		Name:        data.Name,
 		BayID:       data.BayID,
 		Description: data.Description,
@@ -607,8 +702,12 @@ func (s *Service) AddShelfLevel(data AddShelfLevelData) (*AddShelfLevelResult, e
 	if !parentExists {
 		return &AddShelfLevelResult{Code: types.ServiceResultCodeNotFound}, nil
 	}
+	nextCode, err := s.nextShelfLevelCode(query, data.ShelfID)
+	if err != nil {
+		return nil, err
+	}
 	result, err := query.LocationShelfLevels().Create(entities.LocationShelfLevel{
-		Code:        data.Code,
+		Code:        nextCode,
 		Name:        data.Name,
 		ShelfID:     data.ShelfID,
 		Description: data.Description,
@@ -786,8 +885,12 @@ func (s *Service) AddBin(data AddBinData) (*AddBinResult, error) {
 	if !parentExists {
 		return &AddBinResult{Code: types.ServiceResultCodeNotFound}, nil
 	}
+	nextCode, err := s.nextBinCode(query, data.ShelfLevelID)
+	if err != nil {
+		return nil, err
+	}
 	result, err := query.LocationBins().Create(entities.LocationBin{
-		Code:         data.Code,
+		Code:         nextCode,
 		Name:         data.Name,
 		ShelfLevelID: data.ShelfLevelID,
 		Description:  data.Description,
@@ -936,5 +1039,193 @@ func (s *Service) GetBins(data GetBinsData) (*GetBinsResult, error) {
 			Bins: results,
 		},
 		Pagination: paging,
+	}, nil
+}
+
+func (s *Service) GetNextAisleCode(data GetNextAisleCodeData) (*GetNextAisleCodeResult, error) {
+	vld, ok, err := s.providers.Validation().ValidateStruct(data)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return &GetNextAisleCodeResult{
+			Code:       types.ServiceResultCodeInvalid,
+			Validation: vld,
+		}, nil
+	}
+	query, ok := s.providers.Database().Query()
+	if !ok {
+		return &GetNextAisleCodeResult{Code: types.ServiceResultCodeFailed}, nil
+	}
+	locationExists, err := query.Locations().Exists(queries.LocationsParams{
+		ID: &data.LocationID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !locationExists {
+		return &GetNextAisleCodeResult{Code: types.ServiceResultCodeNotFound}, nil
+	}
+	nextCode, err := s.nextAisleCode(query, data.LocationID)
+	if err != nil {
+		return nil, err
+	}
+	return &GetNextAisleCodeResult{
+		Code: types.ServiceResultCodeSuccess,
+		Payload: GetNextCodeResultPayload{
+			Code: nextCode,
+		},
+	}, nil
+}
+
+func (s *Service) GetNextBayCode(data GetNextBayCodeData) (*GetNextBayCodeResult, error) {
+	vld, ok, err := s.providers.Validation().ValidateStruct(data)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return &GetNextBayCodeResult{
+			Code:       types.ServiceResultCodeInvalid,
+			Validation: vld,
+		}, nil
+	}
+	query, ok := s.providers.Database().Query()
+	if !ok {
+		return &GetNextBayCodeResult{Code: types.ServiceResultCodeFailed}, nil
+	}
+	locationID := data.LocationID
+	parentExists, err := query.LocationAisles().Exists(queries.LocationAislesParams{
+		ID:         &data.AisleID,
+		LocationID: &locationID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !parentExists {
+		return &GetNextBayCodeResult{Code: types.ServiceResultCodeNotFound}, nil
+	}
+	nextCode, err := s.nextBayCode(query, data.AisleID)
+	if err != nil {
+		return nil, err
+	}
+	return &GetNextBayCodeResult{
+		Code: types.ServiceResultCodeSuccess,
+		Payload: GetNextCodeResultPayload{
+			Code: nextCode,
+		},
+	}, nil
+}
+
+func (s *Service) GetNextShelfCode(data GetNextShelfCodeData) (*GetNextShelfCodeResult, error) {
+	vld, ok, err := s.providers.Validation().ValidateStruct(data)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return &GetNextShelfCodeResult{
+			Code:       types.ServiceResultCodeInvalid,
+			Validation: vld,
+		}, nil
+	}
+	query, ok := s.providers.Database().Query()
+	if !ok {
+		return &GetNextShelfCodeResult{Code: types.ServiceResultCodeFailed}, nil
+	}
+	locationID := data.LocationID
+	parentExists, err := query.LocationBays().Exists(queries.LocationBaysParams{
+		ID:         &data.BayID,
+		LocationID: &locationID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !parentExists {
+		return &GetNextShelfCodeResult{Code: types.ServiceResultCodeNotFound}, nil
+	}
+	nextCode, err := s.nextShelfCode(query, data.BayID)
+	if err != nil {
+		return nil, err
+	}
+	return &GetNextShelfCodeResult{
+		Code: types.ServiceResultCodeSuccess,
+		Payload: GetNextCodeResultPayload{
+			Code: nextCode,
+		},
+	}, nil
+}
+
+func (s *Service) GetNextShelfLevelCode(data GetNextShelfLevelCodeData) (*GetNextShelfLevelCodeResult, error) {
+	vld, ok, err := s.providers.Validation().ValidateStruct(data)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return &GetNextShelfLevelCodeResult{
+			Code:       types.ServiceResultCodeInvalid,
+			Validation: vld,
+		}, nil
+	}
+	query, ok := s.providers.Database().Query()
+	if !ok {
+		return &GetNextShelfLevelCodeResult{Code: types.ServiceResultCodeFailed}, nil
+	}
+	locationID := data.LocationID
+	parentExists, err := query.LocationShelves().Exists(queries.LocationShelvesParams{
+		ID:         &data.ShelfID,
+		LocationID: &locationID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !parentExists {
+		return &GetNextShelfLevelCodeResult{Code: types.ServiceResultCodeNotFound}, nil
+	}
+	nextCode, err := s.nextShelfLevelCode(query, data.ShelfID)
+	if err != nil {
+		return nil, err
+	}
+	return &GetNextShelfLevelCodeResult{
+		Code: types.ServiceResultCodeSuccess,
+		Payload: GetNextCodeResultPayload{
+			Code: nextCode,
+		},
+	}, nil
+}
+
+func (s *Service) GetNextBinCode(data GetNextBinCodeData) (*GetNextBinCodeResult, error) {
+	vld, ok, err := s.providers.Validation().ValidateStruct(data)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return &GetNextBinCodeResult{
+			Code:       types.ServiceResultCodeInvalid,
+			Validation: vld,
+		}, nil
+	}
+	query, ok := s.providers.Database().Query()
+	if !ok {
+		return &GetNextBinCodeResult{Code: types.ServiceResultCodeFailed}, nil
+	}
+	locationID := data.LocationID
+	parentExists, err := query.LocationShelfLevels().Exists(queries.LocationShelfLevelsParams{
+		ID:         &data.ShelfLevelID,
+		LocationID: &locationID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !parentExists {
+		return &GetNextBinCodeResult{Code: types.ServiceResultCodeNotFound}, nil
+	}
+	nextCode, err := s.nextBinCode(query, data.ShelfLevelID)
+	if err != nil {
+		return nil, err
+	}
+	return &GetNextBinCodeResult{
+		Code: types.ServiceResultCodeSuccess,
+		Payload: GetNextCodeResultPayload{
+			Code: nextCode,
+		},
 	}, nil
 }

@@ -21,6 +21,11 @@ import VueAccordionWizardItem
 import VueFormFileInput from '@/views/shared/components/VueForm/VueFormFileInput.vue'
 import {useProductBrandsStore} from '@/stores/product_brands_store.ts'
 import {
+  LocationAisleCreatedEvent,
+  LocationBayCreatedEvent,
+  LocationBinCreatedEvent,
+  LocationShelfCreatedEvent,
+  LocationShelfLevelCreatedEvent,
   ProductBrandCreatedEvent,
   ProductCategoryCreatedEvent,
   ProductSubcategoryCreatedEvent,
@@ -30,9 +35,14 @@ import {useProductCategoriesStore} from '@/stores/product_categories_store.ts'
 import {useProductSubcategoriesStore} from '@/stores/product_subcategories_store.ts'
 import type {ProductCategoryModel} from '@/app/models/product_category_model.ts'
 import type {ProductSubcategoryModel} from '@/app/models/product_subcategory_model.ts'
-import {useProductAttributesStore} from "@/stores/product_attributes_store.ts";
+import {useProductAttributesStore} from '@/stores/product_attributes_store.ts'
 import type {ProductAttributeModel} from '@/app/models/product_attribute_model.ts'
-import VueFormTextareaInput from "@/views/shared/components/VueForm/VueFormTextareaInput.vue";
+import VueFormTextareaInput from '@/views/shared/components/VueForm/VueFormTextareaInput.vue'
+import type {LocationAisleModel} from '@/app/models/location_aisle_model.ts'
+import type {LocationBayModel} from '@/app/models/location_bay_model.ts'
+import type {LocationShelfModel} from '@/app/models/location_shelf_model.ts'
+import type {LocationShelfLevelModel} from '@/app/models/location_shelf_level_model.ts'
+import type {LocationBinModel} from '@/app/models/location_bin_model.ts'
 
 const app = useApp()
 const productBrandsStore = useProductBrandsStore()
@@ -250,10 +260,11 @@ watch(
       await getProductCategories()
     } else {
       productCategoryOptions.value = []
+      selectedProductBrandId.value = null
       selectedProductCategoryId.value = null
     }
   },
-  {deep: true},
+  {deep: true, immediate: true},
 )
 
 watch(
@@ -354,7 +365,7 @@ const loadOptions = (source: UnwrapRef<any>, options: UnwrapRef<any>, selected: 
       const item = {
         label: val.name,
         value: val.id,
-        selected: val.id == selected.value
+        selected: val.id == selected.value,
       }
       if (index < 0) {
         options.value.push(item)
@@ -560,28 +571,32 @@ const getLocationBins = async (search?: string) => {
   }
 }
 
-const handleProductBrandInputChange = async (value: ISelectInputOption) => {
+const handleProductBrandInputChange = async (value?: ISelectInputOption) => {
   selectedProductBrandId.value = value?.value
 }
 
-const handleProductCategoryInputChange = async (value: ISelectInputOption) => {
+const handleProductCategoryInputChange = async (value?: ISelectInputOption) => {
   selectedProductCategoryId.value = value?.value
 }
 
-const handleLocationBayInputChange = async (value: ISelectInputOption) => {
+const handleLocationBayInputChange = async (value?: ISelectInputOption) => {
   selectedLocationBayId.value = value?.value
 }
 
-const handleLocationAisleInputChange = async (value: ISelectInputOption) => {
+const handleLocationAisleInputChange = async (value?: ISelectInputOption) => {
   selectedLocationAisleId.value = value?.value
 }
 
-const handleLocationShelfInputChange = async (value: ISelectInputOption) => {
+const handleLocationShelfInputChange = async (value?: ISelectInputOption) => {
   selectedLocationShelfId.value = value?.value
 }
 
-const handleLocationShelfLevelInputChange = async (value: ISelectInputOption) => {
+const handleLocationShelfLevelInputChange = async (value?: ISelectInputOption) => {
   selectedLocationShelfLevelId.value = value?.value
+}
+
+const handleLocationBinInputChange = async (value?: ISelectInputOption) => {
+  selectedLocationBinId.value = value?.value
 }
 
 const handleProductBrandSearch = (search: string) => {
@@ -663,6 +678,31 @@ app.events.on(ProductCategoryCreatedEvent, async (data: ProductCategoryModel) =>
 app.events.on(ProductSubcategoryCreatedEvent, async (data: ProductSubcategoryModel) => {
   selectedProductSubcategoryId.value = data.id
   productSubcategoryStore.set(data)
+})
+
+app.events.on(LocationAisleCreatedEvent, async (data: LocationAisleModel) => {
+  selectedLocationAisleId.value = data.id
+  locationAislesStore.set(data)
+})
+
+app.events.on(LocationBayCreatedEvent, async (data: LocationBayModel) => {
+  selectedLocationBayId.value = data.id
+  locationBaysStore.set(data)
+})
+
+app.events.on(LocationShelfCreatedEvent, async (data: LocationShelfModel) => {
+  selectedLocationShelfId.value = data.id
+  locationShelvesStore.set(data)
+})
+
+app.events.on(LocationShelfLevelCreatedEvent, async (data: LocationShelfLevelModel) => {
+  selectedLocationShelfLevelId.value = data.id
+  locationShelfLevelsStore.set(data)
+})
+
+app.events.on(LocationBinCreatedEvent, async (data: LocationBinModel) => {
+  selectedLocationBinId.value = data.id
+  locationBinsStore.set(data)
 })
 
 defineExpose({
@@ -822,11 +862,7 @@ onBeforeUnmount(() => {
               type="date"/>
           </template>
           <template
-            v-else-if="
-              item.fieldType === 'select' ||
-              item.fieldType === 'radio' ||
-              item.fieldType === 'checkbox'
-            ">
+            v-else-if="item.fieldType === 'select' || item.fieldType === 'radio' || item.fieldType === 'checkbox'">
             <vue-form-select-input
               :name="getAttributeInputName(item)"
               :label="item.label"
@@ -968,6 +1004,7 @@ onBeforeUnmount(() => {
           <vue-form-select-input
             :options="locationBinOptions"
             :disabled="isSubmitting || locationBinOptions.length == 0"
+            @change="handleLocationBinInputChange"
             @search="handleLocationBinSearch"
             name="bin_id"
             type="text"

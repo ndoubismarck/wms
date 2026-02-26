@@ -88,20 +88,24 @@ func Setup(ctx types.IContext, engine *gin.Engine, services *services.Services, 
 
 	router.GET("/locations", mw.setup, mw.auth, h.getLocations)
 	router.GET("/:lid/locations/aisles", mw.setup, mw.auth, h.getLocationAisles)
+	router.GET("/:lid/locations/aisles/next-code", mw.setup, mw.auth, h.getLocationNextAisleCode)
 	router.POST("/:lid/locations/aisles", mw.setup, mw.auth, h.addLocationAisle)
 	router.PUT("/:lid/locations/aisles/:id", mw.setup, mw.auth, h.updateLocationAisle)
 	router.GET("/:lid/locations/aisles/:id", mw.setup, mw.auth, h.getLocationAisle)
 	router.DELETE("/:lid/locations/aisles/:id", mw.setup, mw.auth, h.deleteLocationAisle)
 
 	router.GET("/:lid/locations/bays", mw.setup, mw.auth, h.getLocationBays)
+	router.GET("/:lid/locations/bays/next-code", mw.setup, mw.auth, h.getLocationNextBayCode)
 	router.POST("/:lid/locations/bays", mw.setup, mw.auth, h.addLocationBay)
 	router.PUT("/:lid/locations/bays/:id", mw.setup, mw.auth, h.updateLocationBay)
 	router.GET("/:lid/locations/bays/:id", mw.setup, mw.auth, h.getLocationBay)
 	router.DELETE("/:lid/locations/bays/:id", mw.setup, mw.auth, h.deleteLocationBay)
 
 	router.GET("/:lid/locations/shelves", mw.setup, mw.auth, h.getLocationShelves)
+	router.GET("/:lid/locations/shelves/next-code", mw.setup, mw.auth, h.getLocationNextShelfCode)
 	router.POST("/:lid/locations/shelves", mw.setup, mw.auth, h.addLocationShelf)
 	router.GET("/:lid/locations/shelves/levels", mw.setup, mw.auth, h.getLocationShelfLevels)
+	router.GET("/:lid/locations/shelves/levels/next-code", mw.setup, mw.auth, h.getLocationNextShelfLevelCode)
 	router.POST("/:lid/locations/shelves/levels", mw.setup, mw.auth, h.addLocationShelfLevel)
 	router.PUT("/:lid/locations/shelves/levels/:id", mw.setup, mw.auth, h.updateLocationShelfLevel)
 	router.GET("/:lid/locations/shelves/levels/:id", mw.setup, mw.auth, h.getLocationShelfLevel)
@@ -111,6 +115,7 @@ func Setup(ctx types.IContext, engine *gin.Engine, services *services.Services, 
 	router.DELETE("/:lid/locations/shelves/:id", mw.setup, mw.auth, h.deleteLocationShelf)
 
 	router.GET("/:lid/locations/bins", mw.setup, mw.auth, h.getLocationBins)
+	router.GET("/:lid/locations/bins/next-code", mw.setup, mw.auth, h.getLocationNextBinCode)
 	router.POST("/:lid/locations/bins", mw.setup, mw.auth, h.addLocationBin)
 	router.PUT("/:lid/locations/bins/:id", mw.setup, mw.auth, h.updateLocationBin)
 	router.GET("/:lid/locations/bins/:id", mw.setup, mw.auth, h.getLocationBin)

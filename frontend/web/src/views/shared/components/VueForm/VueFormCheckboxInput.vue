@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref, toRef, watch} from 'vue'
-import {ErrorMessage as VeeErrorMessage, Field as VeeField} from 'vee-validate'
-import {useApp} from '@/app/app'
+import { onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
+import { ErrorMessage as VeeErrorMessage, Field as VeeField } from 'vee-validate'
+import { useApp } from '@/app/app'
 
 interface IInputOption {
   key: string
@@ -49,8 +49,7 @@ watch(value, () => {
   model.value = Array.from(new Set(removeValueDuplicates(value.value) as any[]))
 })
 
-onMounted(async () => {
-})
+onMounted(async () => {})
 
 onBeforeUnmount(() => {
   fields.value = []
@@ -78,7 +77,7 @@ onBeforeUnmount(() => {
                 type="checkbox"
                 class="form-check-input"
                 :class="{ 'is-invalid': meta.touched && !meta.valid }"
-                :id="`dropdown-checkbox-${name}-${item.value.key}`"/>
+                :id="`dropdown-checkbox-${name}-${item.value.key}`" />
             </vee-field>
           </div>
           <label class="form-check-label" :for="`dropdown-checkbox-${name}-${item.value.key}`">

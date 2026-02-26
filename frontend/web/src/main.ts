@@ -16,8 +16,6 @@ import '@uppy/dashboard/css/style.min.css'
 import '@uppy/webcam/css/style.min.css'
 import '@uppy/image-editor/css/style.min.css'
 
-import "vue3-select-component/styles";
-
 import 'simplebar/dist/simplebar.css'
 import 'bootstrap/dist/css/bootstrap.css'
 

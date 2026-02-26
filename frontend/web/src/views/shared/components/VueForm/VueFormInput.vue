@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { useApp } from '@/app/app'
-import { onMounted, ref, toRef, watch } from 'vue'
-import { ErrorMessage as VeeErrorMessage, Field as VeeField, type RuleExpression } from 'vee-validate'
+import {useApp} from '@/app/app'
+import {onMounted, ref, toRef, watch} from 'vue'
+import {ErrorMessage as VeeErrorMessage, Field as VeeField, type RuleExpression} from 'vee-validate'
 
-type TInputMode = 'text' | 'email' | 'search' | 'tel' | 'url' | 'none' | 'numeric' | 'decimal' | undefined
+type TInputMode =
+  'text'
+  | 'email'
+  | 'search'
+  | 'tel'
+  | 'url'
+  | 'none'
+  | 'numeric'
+  | 'decimal'
+  | undefined
 
 type TValueFormat = 'lowercase' | 'uppercase'
 
@@ -64,7 +73,7 @@ const handleTogglePasswordInput = (evt: Event) => {
   <div class="w-100">
     <div :class="`input-${type}`">
       <vee-field v-slot="{ field, meta }" :name="name" :rules="validation" v-model="model">
-        <div class="form-floating">
+        <div class="form-control-fi">
           <input
             v-bind="field"
             :type="toggleInputType"
@@ -73,7 +82,7 @@ const handleTogglePasswordInput = (evt: Event) => {
             :inputmode="inputMode"
             :max="max"
             class="form-control"
-            :class="{ 'is-invalid': meta.touched && !meta.valid }" />
+            :class="{ 'is-invalid': meta.touched && meta.validated && !meta.valid }"/>
           <label>{{ label }}</label>
         </div>
       </vee-field>
@@ -84,7 +93,7 @@ const handleTogglePasswordInput = (evt: Event) => {
             :class="{
               'bx-hide': toggleInputType == 'text',
               'bx-show': toggleInputType == 'password',
-            }" />
+            }"/>
         </span>
       </template>
     </div>
@@ -95,24 +104,3 @@ const handleTogglePasswordInput = (evt: Event) => {
     </vee-error-message>
   </div>
 </template>
-
-<style scoped>
-.input-password {
-  position: relative;
-}
-
-.input-password input {
-  padding-right: 35px;
-}
-
-.input-password .toggler {
-  top: calc(50% - 10px);
-  right: 10px;
-  position: absolute;
-  cursor: pointer;
-}
-
-.input-password .toggler:hover {
-  color: var(--bs-primary);
-}
-</style>

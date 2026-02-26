@@ -7,6 +7,7 @@ import Preloader from '@/views/shared/components/Preloader.vue'
 import { useApp } from '@/app/app.ts'
 import type { LocationShelfLevelModel } from '@/app/models/location_shelf_level_model.ts'
 import AddLocationShelfLevelForm from '@/views/shared/components/Forms/AddLocationShelfLevelForm.vue'
+import { LocationShelfLevelCreatedEvent } from '@/views/shared/types/events.ts'
 
 const app = useApp()
 const route = useRoute()
@@ -38,7 +39,7 @@ const handleOffcanvasFormSubmit = () => {
 
 const handleOffcanvasFormSubmitted = async (success: boolean, data?: LocationShelfLevelModel) => {
   if (success && data) {
-    app.events.emit('forms.location.add.shelf.level.submitted', data)
+    app.events.emit(LocationShelfLevelCreatedEvent, data)
   }
 }
 </script>

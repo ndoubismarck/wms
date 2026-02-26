@@ -1,3 +1,95 @@
+.form-control-fi {
+  position: relative;
+}
+
+/* Create space for floating label */
+.form-control-fi > .form-control,
+.form-control-fi > .form-select {
+  padding-top: 1.25rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Hide placeholder ONLY when empty and not focused */
+.form-control-fi > .form-control:placeholder-shown:not(:focus)::placeholder {
+  color: transparent;
+}
+
+/* Label base position (acts like placeholder) */
+.form-control-fi > label {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 0.25rem;
+  line-height: 1;
+  color: var(--bs-secondary-color, #6c757d);
+  background: var(--bs-body-bg, #fff);
+  pointer-events: none;
+  transition: 150ms ease;
+}
+
+/* ===== FLOATING STATE ===== */
+
+/* Input + textarea */
+.form-control-fi > .form-control:focus + label,
+.form-control-fi > .form-control:not(:placeholder-shown) + label {
+  top: 0;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--bs-body-color, #212529);
+}
+
+/* Select */
+.form-control-fi > .form-select:focus + label,
+.form-control-fi > .form-select:valid + label {
+  top: 0;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--bs-body-color, #212529);
+}
+
+/* Textarea alignment tweak */
+.form-control-fi > textarea.form-control + label {
+  top: 1.05rem;
+  transform: translateY(0);
+}
+
+.form-control-fi > textarea.form-control:focus + label,
+.form-control-fi > textarea.form-control:not(:placeholder-shown) + label {
+  top: 0;
+  transform: translateY(-50%);
+}
+
+.input-password {
+  position: relative;
+}
+
+.input-password input {
+  padding-right: 35px;
+}
+
+.input-password .toggler {
+  top: calc(50% - 10px);
+  right: 10px;
+  position: absolute;
+  cursor: pointer;
+}
+
+.input-password .toggler:hover {
+  color: var(--bs-primary);
+}
+
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
+  background-image: none !important;
+  padding-right: 0.75rem;
+}
+
+.input-group .form-control.is-invalid {
+  background-image: none !important;
+  padding-right: 0.75rem;
+}
+
 .misc-wrapper {
   display: -webkit-box;
   display: -ms-flexbox;

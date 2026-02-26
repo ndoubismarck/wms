@@ -1,5 +1,5 @@
-import {DatabaseModel} from '@/app/core/model'
-import {ProductAttributeOptionModel} from '@/app/models/product_attribute_option_model'
+import { DatabaseModel } from '@/app/core/model'
+import { ProductAttributeOptionModel } from '@/app/models/product_attribute_option_model'
 
 export class ProductAttributeModel extends DatabaseModel {
   public readonly attributeId: string
@@ -14,10 +14,8 @@ export class ProductAttributeModel extends DatabaseModel {
 
   constructor(data: any) {
     super(data)
-    this.attributeId =
-      this.getString('product_attribute_id') || this.getString('attribute_id') || this.getString('id')
-    this.attributeOptionId =
-      this.getString('product_attribute_option_id') || this.getString('attribute_option_id')
+    this.attributeId = this.getString('product_attribute_id') || this.getString('attribute_id') || this.getString('id')
+    this.attributeOptionId = this.getString('product_attribute_option_id') || this.getString('attribute_option_id')
     this.label =
       this.getString('label') ||
       this.getString('product_attribute_definition.label') ||
@@ -60,16 +58,17 @@ export class ProductAttributeModel extends DatabaseModel {
         : this.getArray('product_attribute_definition.options').length > 0
           ? this.getArray('product_attribute_definition.options')
           : this.getArray('definition.options')
-    this.options = resolvedOptions.map((value) =>
-      new ProductAttributeOptionModel(
-        typeof value === 'string'
-          ? {
-              id: value,
-              option_id: value,
-              label: value,
-            }
-          : value,
-      ),
+    this.options = resolvedOptions.map(
+      (value) =>
+        new ProductAttributeOptionModel(
+          typeof value === 'string'
+            ? {
+                id: value,
+                option_id: value,
+                label: value,
+              }
+            : value,
+        ),
     )
   }
 }

@@ -10,8 +10,8 @@ import (
 
 type LocationShelfLevel struct {
 	ID          string         `gorm:"type:varchar(150);primaryKey;unique" json:"id"`
-	ShelfID     string         `gorm:"type:varchar(150)" json:"shelf_id"`
-	Code        string         `gorm:"type:varchar(10);uniqueIndex" json:"code"`
+	ShelfID     string         `gorm:"type:varchar(150);not null;index;uniqueIndex:idx_location_shelf_levels_shelf_code" json:"shelf_id"`
+	Code        string         `gorm:"type:varchar(10);not null;uniqueIndex:idx_location_shelf_levels_shelf_code" json:"code"`
 	Name        string         `gorm:"type:varchar(150);unique" json:"name"`
 	Description string         `gorm:"type:text" json:"description"`
 	Location    string         `gorm:"->" json:"location"`

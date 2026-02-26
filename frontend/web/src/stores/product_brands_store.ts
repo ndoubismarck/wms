@@ -24,7 +24,7 @@ export const useProductBrandsStore = defineStore('product_brands', (): IProductB
   const set = (value: ProductBrandModel | ProductBrandModel[]): void => {
     if (Array.isArray(value)) {
       value.forEach((item) => {
-        const index = data.value.findIndex((val) => val.id == item.id)
+        const index = data.value.findIndex((val) => val.id === item.id)
         if (index < 0) {
           data.value.push(item)
         } else {

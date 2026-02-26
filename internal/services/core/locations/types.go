@@ -405,3 +405,68 @@ type (
 		Bins []entities.LocationBin `json:"bins"`
 	}
 )
+
+type (
+	GetNextCodeResultPayload struct {
+		Code string `json:"code"`
+	}
+)
+
+type (
+	GetNextAisleCodeData struct {
+		LocationID string `json:"-" form:"-" validate:"required"`
+	}
+	GetNextAisleCodeResult struct {
+		Code       types.ServiceResultCode
+		Payload    GetNextCodeResultPayload
+		Validation types.ValidationResult
+	}
+)
+
+type (
+	GetNextBayCodeData struct {
+		LocationID string `json:"-" form:"-" validate:"required"`
+		AisleID    string `json:"aisle_id" form:"aisle_id" validate:"required"`
+	}
+	GetNextBayCodeResult struct {
+		Code       types.ServiceResultCode
+		Payload    GetNextCodeResultPayload
+		Validation types.ValidationResult
+	}
+)
+
+type (
+	GetNextShelfCodeData struct {
+		LocationID string `json:"-" form:"-" validate:"required"`
+		BayID      string `json:"bay_id" form:"bay_id" validate:"required"`
+	}
+	GetNextShelfCodeResult struct {
+		Code       types.ServiceResultCode
+		Payload    GetNextCodeResultPayload
+		Validation types.ValidationResult
+	}
+)
+
+type (
+	GetNextShelfLevelCodeData struct {
+		LocationID string `json:"-" form:"-" validate:"required"`
+		ShelfID    string `json:"shelf_id" form:"shelf_id" validate:"required"`
+	}
+	GetNextShelfLevelCodeResult struct {
+		Code       types.ServiceResultCode
+		Payload    GetNextCodeResultPayload
+		Validation types.ValidationResult
+	}
+)
+
+type (
+	GetNextBinCodeData struct {
+		LocationID   string `json:"-" form:"-" validate:"required"`
+		ShelfLevelID string `json:"shelf_level_id" form:"shelf_level_id" validate:"required"`
+	}
+	GetNextBinCodeResult struct {
+		Code       types.ServiceResultCode
+		Payload    GetNextCodeResultPayload
+		Validation types.ValidationResult
+	}
+)

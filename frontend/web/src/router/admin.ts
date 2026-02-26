@@ -1,7 +1,10 @@
 import Dashboard from '@/views/pages/Admin/Dashboard/Dashboard.vue'
+import Staff from '@/views/pages/Admin/Staff/Staff.vue'
+import Roles from '@/views/pages/Admin/Roles/Roles.vue'
+import Tasks from '@/views/pages/Admin/Tasks/Tasks.vue'
 import Inventory from '@/views/pages/Admin/Inventory/Inventory.vue'
+import InventoryMovements from '@/views/pages/Admin/Inventory/Movements.vue'
 import ProductDetails from '@/views/pages/Admin/Inventory/ProductDetails.vue'
-import Stock from '@/views/pages/Admin/Inventory/Stock.vue'
 import AddProduct from '@/views/pages/Admin/Inventory/AddProduct.vue'
 import AddLocationBin from '@/views/pages/Admin/Inventory/AddLocationBin.vue'
 import AddLocationAisle from '@/views/pages/Admin/Inventory/AddLocationAisle.vue'
@@ -13,7 +16,13 @@ import Products from '@/views/pages/Admin/Inventory/Products.vue'
 import Warehouse from '@/views/pages/Admin/Warehouse/Warehouse.vue'
 import AddProductBrand from '@/views/pages/Admin/Inventory/AddProductBrand.vue'
 import AddProductCategory from '@/views/pages/Admin/Inventory/AddProductCategory.vue'
-import AddProductSubcategory from "@/views/pages/Admin/Inventory/AddProductSubcategory.vue";
+import AddProductSubcategory from '@/views/pages/Admin/Inventory/AddProductSubcategory.vue'
+import Orders from '@/views/pages/Admin/Operations/Orders.vue'
+import Shipments from '@/views/pages/Admin/Operations/Shipments.vue'
+import Customers from '@/views/pages/Admin/Customers/Customers.vue'
+import Settings from '@/views/pages/Admin/Settings/Settings.vue'
+import Suppliers from '@/views/pages/Admin/Suppliers/Suppliers.vue'
+import Help from '@/views/pages/Admin/Help/Help.vue'
 
 export default [
   {
@@ -33,6 +42,33 @@ export default [
       breadcrumb: ['admin:inventory'],
     },
     component: Inventory,
+  },
+  {
+    path: '/admin/staff',
+    name: 'admin:staff',
+    meta: {
+      title: 'Staff',
+      breadcrumb: ['admin:staff'],
+    },
+    component: Staff,
+  },
+  {
+    path: '/admin/roles',
+    name: 'admin:roles',
+    meta: {
+      title: 'Roles',
+      breadcrumb: ['admin:roles'],
+    },
+    component: Roles,
+  },
+  {
+    path: '/admin/tasks',
+    name: 'admin:tasks',
+    meta: {
+      title: 'Tasks',
+      breadcrumb: ['admin:tasks'],
+    },
+    component: Tasks,
   },
   {
     path: '/admin/inventory/products',
@@ -79,62 +115,59 @@ export default [
             },
             component: AddProductSubcategory,
           },
-          //
           {
-            path: '/admin/inventory/products/add/bin',
+            path: '/admin/inventory/products/add/aisle',
+            name: 'admin:inventory:products:aisle:add',
+            meta: {
+              title: 'Add Aisle',
+              breadcrumb: ['admin:inventory'],
+            },
+            component: AddLocationAisle,
+          },
+          {
+            path: '/admin/inventory/products/add/bay/:aisleId',
+            name: 'admin:inventory:products:bay:add',
+            meta: {
+              title: 'Add Bay',
+              breadcrumb: ['admin:inventory'],
+            },
+            component: AddLocationBay,
+          },
+          {
+            path: '/admin/inventory/products/add/shelf/:bayId',
+            name: 'admin:inventory:products:shelf:add',
+            meta: {
+              title: 'Add Shelf',
+              breadcrumb: ['admin:inventory'],
+            },
+            component: AddLocationShelf,
+          },
+          {
+            path: '/admin/inventory/products/add/shelf/level/:shelfId',
+            name: 'admin:inventory:products:shelf:level:add',
+            meta: {
+              title: 'Add Shelf Level',
+              breadcrumb: ['admin:inventory'],
+            },
+            component: AddLocationShelfLevel,
+          },
+          {
+            path: '/admin/inventory/products/add/bin/category',
+            name: 'admin:inventory:products:bin:category:add',
+            meta: {
+              title: 'Add Bin Category',
+              breadcrumb: ['admin:inventory'],
+            },
+            component: AddLocationBinCategory,
+          },
+          {
+            path: '/admin/inventory/products/add/bin/:shelfLevelId',
             name: 'admin:inventory:products:bin:add',
             meta: {
               title: 'Add Location Bin',
               breadcrumb: ['admin:inventory'],
             },
             component: AddLocationBin,
-            children: [
-              {
-                path: '/admin/inventory/products/add/aisle',
-                name: 'admin:inventory:products:aisle:add',
-                meta: {
-                  title: 'Add Aisle',
-                  breadcrumb: ['admin:inventory'],
-                },
-                component: AddLocationAisle,
-              },
-              {
-                path: '/admin/inventory/products/add/bay/:aisleId',
-                name: 'admin:inventory:products:bay:add',
-                meta: {
-                  title: 'Add Bay',
-                  breadcrumb: ['admin:inventory'],
-                },
-                component: AddLocationBay,
-              },
-              {
-                path: '/admin/inventory/products/add/shelf/:bayId',
-                name: 'admin:inventory:products:shelf:add',
-                meta: {
-                  title: 'Add Shelf',
-                  breadcrumb: ['admin:inventory'],
-                },
-                component: AddLocationShelf,
-              },
-              {
-                path: '/admin/inventory/products/add/shelf/level/:shelfId',
-                name: 'admin:inventory:products:shelf:level:add',
-                meta: {
-                  title: 'Add Shelf Level',
-                  breadcrumb: ['admin:inventory'],
-                },
-                component: AddLocationShelfLevel,
-              },
-              {
-                path: '/admin/inventory/products/add/bin/category',
-                name: 'admin:inventory:products:bin:category:add',
-                meta: {
-                  title: 'Add Bin Category',
-                  breadcrumb: ['admin:inventory'],
-                },
-                component: AddLocationBinCategory,
-              },
-            ],
           },
         ],
       },
@@ -159,13 +192,49 @@ export default [
     component: ProductDetails,
   },
   {
-    path: '/admin/inventory/stock',
-    name: 'admin:inventory:stock',
+    path: '/admin/inventory/movements',
+    name: 'admin:inventory:movements',
     meta: {
-      title: 'Stock',
-      breadcrumb: ['admin:inventory', 'admin:inventory:stock'],
+      title: 'Movements',
+      breadcrumb: ['admin:inventory', 'admin:inventory:movements'],
     },
-    component: Stock,
+    component: InventoryMovements,
+  },
+  {
+    path: '/admin/operations/orders',
+    name: 'admin:operations:orders',
+    meta: {
+      title: 'Orders',
+      breadcrumb: ['admin:operations:orders'],
+    },
+    component: Orders,
+  },
+  {
+    path: '/admin/operations/shipments',
+    name: 'admin:operations:shipments',
+    meta: {
+      title: 'Shipments',
+      breadcrumb: ['admin:operations:shipments'],
+    },
+    component: Shipments,
+  },
+  {
+    path: '/admin/operations/customers',
+    name: 'admin:suppliers:customers',
+    meta: {
+      title: 'Customers',
+      breadcrumb: ['admin:suppliers:customers'],
+    },
+    component: Customers,
+  },
+  {
+    path: '/admin/operations/suppliers',
+    name: 'admin:suppliers:list',
+    meta: {
+      title: 'Suppliers',
+      breadcrumb: ['admin:suppliers:list'],
+    },
+    component: Suppliers,
   },
   {
     path: '/admin/warehouse',
@@ -222,15 +291,6 @@ export default [
     component: Inventory,
   },
   {
-    path: '/admin/stock',
-    name: 'admin:stock',
-    meta: {
-      title: 'Stock',
-      breadcrumb: ['admin:stock'],
-    },
-    component: Stock,
-  },
-  {
     path: '/admin/account',
     name: 'admin:account',
     meta: {
@@ -246,14 +306,21 @@ export default [
       title: 'Settings',
       breadcrumb: ['admin:settings'],
     },
-    component: Dashboard,
+    component: Settings,
+  },
+  {
+    path: '/admin/help',
+    name: 'admin:help',
+    meta: {
+      title: 'Help and Support',
+    },
+    component: Help,
   },
   {
     path: '/admin/activation',
     name: 'admin:activation',
     meta: {
       title: 'Product Activation',
-      breadcrumb: ['admin:activation'],
     },
     component: Dashboard,
   },

@@ -68,6 +68,9 @@ func (p *Provider) migrate() error {
 	if err := p.migrateLegacyTables(); err != nil {
 		return err
 	}
+	if err := p.migrateLegacyLocationCodeIndexes(); err != nil {
+		return err
+	}
 	if err := p.conn.AutoMigrate(&entities.User{}); err != nil {
 		return err
 	}
@@ -125,6 +128,17 @@ func (p *Provider) migrate() error {
 	return nil
 }
 
+func (p *Provider) dropLegacyIndex(entity interface{}, names ...string) error {
+	for _, name := range names {
+		if p.conn.Migrator().HasIndex(entity, name) {
+			if err := p.conn.Migrator().DropIndex(entity, name); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (p *Provider) migrateLegacyTables() error {
 	legacyInventoryTable := "inventories"
 	inventoryTable := (&entities.Inventory{}).TableName()
@@ -135,6 +149,46 @@ func (p *Provider) migrateLegacyTables() error {
 		}
 	}
 
+	return nil
+}
+
+func (p *Provider) migrateLegacyLocationCodeIndexes() error {
+	if err := p.dropLegacyIndex(
+		&entities.LocationAisle{},
+		"idx_location_aisles_code",
+		"uni_location_aisles_code",
+		"location_aisles_code_key",
+	); err != nil {
+		return err
+	}
+	if err := p.dropLegacyIndex(
+		&entities.LocationBay{},
+		"idx_location_bays_code",
+		"location_bays_code_key",
+	); err != nil {
+		return err
+	}
+	if err := p.dropLegacyIndex(
+		&entities.LocationShelf{},
+		"idx_locations_shelves_code",
+		"locations_shelves_code_key",
+	); err != nil {
+		return err
+	}
+	if err := p.dropLegacyIndex(
+		&entities.LocationShelfLevel{},
+		"idx_location_shelf_levels_code",
+		"location_shelf_levels_code_key",
+	); err != nil {
+		return err
+	}
+	if err := p.dropLegacyIndex(
+		&entities.LocationBin{},
+		"idx_location_bins_code",
+		"location_bins_code_key",
+	); err != nil {
+		return err
+	}
 	return nil
 }
 

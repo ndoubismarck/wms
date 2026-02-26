@@ -49,6 +49,21 @@ func (q *LocationAisles) Create(data entities.LocationAisle) (entities.LocationA
 	return data, nil
 }
 
+func (q *LocationAisles) FindCodes(params LocationAislesParams) ([]string, error) {
+	var rows []struct {
+		Code string `gorm:"column:code"`
+	}
+	query := q.queryParams(params).Select("location_aisles.code")
+	if err := query.Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	result := make([]string, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, row.Code)
+	}
+	return result, nil
+}
+
 func (q *LocationAisles) Count(params LocationAislesParams) (uint64, error) {
 	var result int64
 	query := q.queryParams(params)

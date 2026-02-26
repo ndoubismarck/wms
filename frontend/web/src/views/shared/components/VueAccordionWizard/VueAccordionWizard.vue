@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onBeforeUnmount, provide, ref } from 'vue'
+import {onBeforeUnmount, provide, ref} from 'vue'
 
 const items = ref<number[]>([])
 const currentIndex = ref(0)
+const transitionDirection = ref<'forward' | 'backward'>('forward')
 
 function register(uid: number) {
   if (!items.value.includes(uid)) {
@@ -11,8 +12,26 @@ function register(uid: number) {
   return items.value.indexOf(uid)
 }
 
+function unregister(uid: number) {
+  const index = items.value.indexOf(uid)
+  if (index < 0) {
+    return
+  }
+
+  items.value.splice(index, 1)
+
+  if (currentIndex.value > index) {
+    currentIndex.value -= 1
+  }
+
+  if (currentIndex.value >= items.value.length) {
+    currentIndex.value = Math.max(0, items.value.length - 1)
+  }
+}
+
 function openByIndex(index: number) {
   if (index >= 0 && index < items.value.length) {
+    transitionDirection.value = index >= currentIndex.value ? 'forward' : 'backward'
     currentIndex.value = index
   }
 }
@@ -41,7 +60,9 @@ provide('accordion', {
   hasNext,
   hasPrev,
   register,
+  unregister,
   currentIndex,
+  transitionDirection,
 })
 
 defineExpose({
@@ -54,13 +75,12 @@ defineExpose({
 onBeforeUnmount(() => {
   items.value = []
   currentIndex.value = 0
+  transitionDirection.value = 'forward'
 })
 </script>
 
 <template>
   <div class="accordion">
-    <slot :next="next" :prev="prev" :hasNext="hasNext" :hasPrev="hasPrev" />
+    <slot :next="next" :prev="prev" :hasNext="hasNext" :hasPrev="hasPrev"/>
   </div>
 </template>
-
-<style scoped></style>

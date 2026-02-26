@@ -85,15 +85,6 @@ defineExpose({
         <div class="mb-6">
           <vue-form-input
             :disabled="isSubmitting"
-            inputMode="numeric"
-            name="code"
-            type="text"
-            label="Shelf Level Code"
-            placeholder="Shelf Level Code" />
-        </div>
-        <div class="mb-6">
-          <vue-form-input
-            :disabled="isSubmitting"
             name="name"
             type="text"
             label="Shelf Level Name"

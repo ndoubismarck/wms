@@ -56,6 +56,21 @@ func (q *LocationShelves) Create(data entities.LocationShelf) (entities.Location
 	return data, nil
 }
 
+func (q *LocationShelves) FindCodes(params LocationShelvesParams) ([]string, error) {
+	var rows []struct {
+		Code string `gorm:"column:code"`
+	}
+	query := q.queryParams(params).Select("locations_shelves.code")
+	if err := query.Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	result := make([]string, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, row.Code)
+	}
+	return result, nil
+}
+
 func (q *LocationShelves) Count(params LocationShelvesParams) (uint64, error) {
 	var result int64
 	query := q.queryParams(params)
@@ -109,7 +124,7 @@ func (q *LocationShelves) FindMany(params LocationShelvesParams, pagination type
 	}
 	paginationResult := pagination.GetResult(count)
 	if err := query.
-		Order(pagination.GetOrder()).
+		Order(pagination.GetOrderWithPrefix("locations_shelves")).
 		Limit(pagination.GetLimit()).
 		Offset(pagination.GetOffset()).
 		Find(&results).Error; err != nil {

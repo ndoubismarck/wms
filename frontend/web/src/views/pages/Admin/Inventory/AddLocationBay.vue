@@ -7,6 +7,7 @@ import Preloader from '@/views/shared/components/Preloader.vue'
 import { useApp } from '@/app/app.ts'
 import type { LocationBayModel } from '@/app/models/location_bay_model.ts'
 import AddLocationBayForm from '@/views/shared/components/Forms/AddLocationBayForm.vue'
+import { LocationBayCreatedEvent } from '@/views/shared/types/events.ts'
 
 const app = useApp()
 const route = useRoute()
@@ -38,7 +39,7 @@ const handleOffcanvasFormSubmit = () => {
 
 const handleOffcanvasFormSubmitted = async (success: boolean, data?: LocationBayModel) => {
   if (success && data) {
-    app.events.emit('forms.location.add.bay.submitted', data)
+    app.events.emit(LocationBayCreatedEvent, data)
   }
 }
 </script>

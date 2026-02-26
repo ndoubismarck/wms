@@ -84,15 +84,6 @@ defineExpose({
       <vue-form ref="form" @submit="handleSubmit" :validationSchema="validationSchema">
         <alert-message v-if="alert" :params="alert" />
         <div class="mb-6">
-          <vue-form-input
-            :disabled="isSubmitting"
-            inputMode="numeric"
-            name="code"
-            type="text"
-            label="Bay Code"
-            placeholder="Bay Code" />
-        </div>
-        <div class="mb-6">
           <vue-form-input :disabled="isSubmitting" name="name" type="text" label="Bay Name" placeholder="Bay Name" />
         </div>
         <div class="mb-6">

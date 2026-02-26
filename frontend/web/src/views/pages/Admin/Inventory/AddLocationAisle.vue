@@ -7,6 +7,7 @@ import Preloader from '@/views/shared/components/Preloader.vue'
 import AddLocationAisleForm from '@/views/shared/components/Forms/AddLocationAisleForm.vue'
 import { useApp } from '@/app/app.ts'
 import type { LocationAisleModel } from '@/app/models/location_aisle_model.ts'
+import { LocationAisleCreatedEvent } from '@/views/shared/types/events.ts'
 
 const app = useApp()
 const router = useRouter()
@@ -35,7 +36,7 @@ const handleOffcanvasFormSubmit = () => {
 
 const handleOffcanvasFormSubmitted = async (success: boolean, data?: LocationAisleModel) => {
   if (success && data) {
-    app.events.emit('forms.location.add.aisle.submitted', data)
+    app.events.emit(LocationAisleCreatedEvent, data)
   }
 }
 </script>

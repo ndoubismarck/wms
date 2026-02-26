@@ -2,6 +2,7 @@ package entities
 
 import (
 	"errors"
+	"fmt"
 	"server/internal/core/shared/utils/cryptoutil"
 	"server/internal/core/shared/utils/stringutil"
 	"time"
@@ -12,6 +13,7 @@ import (
 type Location struct {
 	ID          string    `gorm:"type:varchar(150);primaryKey;unique" json:"id"`
 	Code        uint32    `gorm:"uniqueIndex" json:"-"`
+	CodeValue   string    `gorm:"-" json:"code"`
 	Name        string    `gorm:"type:varchar(150);unique" json:"name"`
 	Description string    `gorm:"type:text" json:"description"`
 	UpdatedAt   time.Time `json:"updated_at"`
@@ -36,5 +38,25 @@ func (e *Location) BeforeCreate(tx *gorm.DB) error {
 		}
 		e.Code = data.Code + 1
 	}
+	e.syncCodeValue()
 	return nil
+}
+
+func (e *Location) AfterFind(tx *gorm.DB) error {
+	e.syncCodeValue()
+	return nil
+}
+
+func (e *Location) AfterCreate(tx *gorm.DB) error {
+	e.syncCodeValue()
+	return nil
+}
+
+func (e *Location) AfterUpdate(tx *gorm.DB) error {
+	e.syncCodeValue()
+	return nil
+}
+
+func (e *Location) syncCodeValue() {
+	e.CodeValue = fmt.Sprintf("%02d", e.Code)
 }

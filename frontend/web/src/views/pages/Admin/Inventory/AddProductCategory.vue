@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import Offcanvas, {type IOffcanvas} from '@/views/shared/components/Offcanvas.vue'
-import {useRoute, useRouter} from 'vue-router'
-import {computed, ref, toRef} from 'vue'
-import {EPreloaderSize} from '@/app/types.ts'
+import Offcanvas, { type IOffcanvas } from '@/views/shared/components/Offcanvas.vue'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, ref, toRef } from 'vue'
+import { EPreloaderSize } from '@/app/types.ts'
 import Preloader from '@/views/shared/components/Preloader.vue'
-import {useApp} from '@/app/app.ts'
-import {ProductBrandModel} from '@/app/models/product_brand_model.ts'
-import {ProductCategoryCreatedEvent} from '@/views/shared/types/events.ts'
+import { useApp } from '@/app/app.ts'
+import { ProductBrandModel } from '@/app/models/product_brand_model.ts'
+import { ProductCategoryCreatedEvent } from '@/views/shared/types/events.ts'
 import AddProductCategoryForm from '@/views/shared/components/Forms/AddProductCategoryForm.vue'
 
 const app = useApp()
@@ -55,10 +55,10 @@ const handleOffcanvasFormSubmitted = async (success: boolean, data?: ProductBran
         ref="offcanvasForm"
         :brandId="brandId"
         @submit="handleOffcanvasFormSubmit"
-        @submitted="handleOffcanvasFormSubmitted"/>
+        @submitted="handleOffcanvasFormSubmitted" />
     </template>
     <template v-if="offcanvasForm?.isSubmitting" #overlay>
-      <preloader :size="EPreloaderSize.SM" :overlay="true"/>
+      <preloader :size="EPreloaderSize.SM" :overlay="true" />
     </template>
   </offcanvas>
 </template>

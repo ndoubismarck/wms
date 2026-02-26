@@ -55,6 +55,21 @@ func (q *LocationBays) Create(data entities.LocationBay) (entities.LocationBay, 
 	return data, nil
 }
 
+func (q *LocationBays) FindCodes(params LocationBaysParams) ([]string, error) {
+	var rows []struct {
+		Code string `gorm:"column:code"`
+	}
+	query := q.queryParams(params).Select("location_bays.code")
+	if err := query.Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	result := make([]string, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, row.Code)
+	}
+	return result, nil
+}
+
 func (q *LocationBays) Count(params LocationBaysParams) (uint64, error) {
 	var result int64
 	query := q.queryParams(params)
@@ -108,7 +123,7 @@ func (q *LocationBays) FindMany(params LocationBaysParams, pagination types.IPag
 	}
 	paginationResult := pagination.GetResult(count)
 	if err := query.
-		Order(pagination.GetOrder()).
+		Order(pagination.GetOrderWithPrefix("location_bays")).
 		Limit(pagination.GetLimit()).
 		Offset(pagination.GetOffset()).
 		Find(&results).Error; err != nil {

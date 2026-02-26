@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import Offcanvas, {type IOffcanvas} from '@/views/shared/components/Offcanvas.vue'
-import {useRoute, useRouter} from 'vue-router'
+import Offcanvas, { type IOffcanvas } from '@/views/shared/components/Offcanvas.vue'
+import { useRoute, useRouter } from 'vue-router'
 import AddProductForm from '@/views/shared/components/Forms/AddProductForm.vue'
-import {onBeforeMount, ref} from 'vue'
-import {EPreloaderSize} from '@/app/types.ts'
+import { onBeforeMount, ref } from 'vue'
+import { EPreloaderSize } from '@/app/types.ts'
 import Preloader from '@/views/shared/components/Preloader.vue'
-import {useApp} from '@/app/app.ts'
-import type {ProductModel} from '@/app/models/product_model.ts'
-import {useProductsStore} from '@/stores/products_store.ts'
+import { useApp } from '@/app/app.ts'
+import type { ProductModel } from '@/app/models/product_model.ts'
+import { useProductsStore } from '@/stores/products_store.ts'
 
 const app = useApp()
 const route = useRoute()
@@ -31,7 +31,7 @@ const handleAddProductCategory = async (brandId: string) => {
   await app.helpers.async.sleep(100)
   await router.push({
     name: 'admin:inventory:products:add:category',
-    params: {brandId: brandId},
+    params: { brandId: brandId },
   })
 }
 
@@ -40,7 +40,63 @@ const handleAddProductSubcategory = async (categoryId: string) => {
   await app.helpers.async.sleep(100)
   await router.push({
     name: 'admin:inventory:products:add:subcategory',
-    params: {categoryId: categoryId},
+    params: { categoryId: categoryId },
+  })
+}
+
+const handleAddLocationAisle = async () => {
+  showChildView.value = true
+  await app.helpers.async.sleep(100)
+  await router.push({
+    name: 'admin:inventory:products:aisle:add',
+  })
+}
+
+const handleAddLocationBay = async (aisleId?: string) => {
+  if (!aisleId) {
+    return
+  }
+  showChildView.value = true
+  await app.helpers.async.sleep(100)
+  await router.push({
+    name: 'admin:inventory:products:bay:add',
+    params: { aisleId },
+  })
+}
+
+const handleAddLocationShelf = async (bayId?: string) => {
+  if (!bayId) {
+    return
+  }
+  showChildView.value = true
+  await app.helpers.async.sleep(100)
+  await router.push({
+    name: 'admin:inventory:products:shelf:add',
+    params: { bayId },
+  })
+}
+
+const handleAddLocationShelfLevel = async (shelfId?: string) => {
+  if (!shelfId) {
+    return
+  }
+  showChildView.value = true
+  await app.helpers.async.sleep(100)
+  await router.push({
+    name: 'admin:inventory:products:shelf:level:add',
+    params: { shelfId },
+  })
+}
+
+const handleAddLocationBin = async (shelfLevelId?: string) => {
+  if (!shelfLevelId) {
+    return
+  }
+  showChildView.value = true
+  await app.helpers.async.sleep(100)
+  await router.push({
+    name: 'admin:inventory:products:bin:add',
+    params: { shelfLevelId },
   })
 }
 
@@ -88,11 +144,16 @@ onBeforeMount(() => {
         @submitted="handleOffcanvasFormSubmitted"
         @addProductBrand="handleAddProductBrand"
         @addProductCategory="handleAddProductCategory"
-        @addProductSubcategory="handleAddProductSubcategory"/>
+        @addProductSubcategory="handleAddProductSubcategory"
+        @addLocationAisle="handleAddLocationAisle"
+        @addLocationBay="handleAddLocationBay"
+        @addLocationShelf="handleAddLocationShelf"
+        @addLocationShelfLevel="handleAddLocationShelfLevel"
+        @addLocationBin="handleAddLocationBin" />
     </template>
     <template v-if="offcanvasForm?.isLoading || offcanvasForm?.isSubmitting" #overlay>
-      <preloader :size="EPreloaderSize.SM" :overlay="true"/>
+      <preloader :size="EPreloaderSize.SM" :overlay="true" />
     </template>
   </offcanvas>
-  <router-view v-if="offcanvas && showChildView" :parent="offcanvas"/>
+  <router-view v-if="offcanvas && showChildView" :parent="offcanvas" />
 </template>

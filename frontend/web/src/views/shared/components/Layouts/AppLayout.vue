@@ -132,6 +132,7 @@ onMounted(() => {
         </nav>
         <div class="content-wrapper">
           <div class="container-xxl flex-grow-1 container-p-y">
+            <slot name="page.breadcrumb" />
             <slot name="page.content" />
           </div>
           <footer class="content-footer footer bg-footer-theme">

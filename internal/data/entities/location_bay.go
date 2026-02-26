@@ -10,8 +10,8 @@ import (
 
 type LocationBay struct {
 	ID          string         `gorm:"type:varchar(150);primaryKey;unique" json:"id"`
-	AisleID     string         `gorm:"type:varchar(150)" json:"aisle_id"`
-	Code        string         `gorm:"type:varchar(10);uniqueIndex" json:"code"`
+	AisleID     string         `gorm:"type:varchar(150);not null;index;uniqueIndex:idx_location_bays_aisle_code" json:"aisle_id"`
+	Code        string         `gorm:"type:varchar(10);not null;uniqueIndex:idx_location_bays_aisle_code" json:"code"`
 	Name        string         `gorm:"type:varchar(150)" json:"name"`
 	Description string         `gorm:"type:text" json:"description"`
 	Location    string         `gorm:"->" json:"location"`

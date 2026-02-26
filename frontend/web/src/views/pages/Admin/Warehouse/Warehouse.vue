@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import Breadcrumb from '@/views/shared/components/Breadcrumb.vue'
-</script>
+<script setup lang="ts"></script>
 
-<template>
-  <breadcrumb> </breadcrumb>
-</template>
+<template></template>

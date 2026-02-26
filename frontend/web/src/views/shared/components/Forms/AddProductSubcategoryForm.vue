@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import VueFormInput from '@/views/shared/components/VueForm/VueFormInput.vue'
-import {computed, onMounted, ref, toRef} from 'vue'
-import {useApp} from '@/app/app'
-import VueForm, {type VueFormData} from '@/views/shared/components/VueForm/VueForm.vue'
+import { computed, onMounted, ref, toRef } from 'vue'
+import { useApp } from '@/app/app'
+import VueForm, { type VueFormData } from '@/views/shared/components/VueForm/VueForm.vue'
 import AlertMessage from '@/views/shared/components/AlertMessage.vue'
-import {EAlertMessageType, type IAlertMessage} from '@/app/types.ts'
-import {useProductCategoriesStore} from "@/stores/product_categories_store.ts";
-import type {ProductSubcategoryModel} from "@/app/models/product_subcategory_model.ts";
+import { EAlertMessageType, type IAlertMessage } from '@/app/types.ts'
+import { useProductCategoriesStore } from '@/stores/product_categories_store.ts'
+import type { ProductSubcategoryModel } from '@/app/models/product_subcategory_model.ts'
 
 const app = useApp()
 const productCategoriesStore = useProductCategoriesStore()
@@ -126,14 +126,14 @@ onMounted(async () => {
   <div class="card">
     <div class="card-body">
       <vue-form ref="form" @submit="handleSubmit">
-        <alert-message v-if="alert" :params="alert"/>
+        <alert-message v-if="alert" :params="alert" />
         <div class="mb-6">
           <vue-form-input
             :disabled="isSubmitting || !productCategory"
             name="name"
             type="text"
             :label="`${productCategory?.name} Subcategory Name`"
-            :placeholder="`Enter ${productCategory?.name} Subcategory Name`"/>
+            :placeholder="`Enter ${productCategory?.name} Subcategory Name`" />
         </div>
         <button :disabled="isSubmitting || !productCategory" class="btn btn-primary">Submit</button>
       </vue-form>

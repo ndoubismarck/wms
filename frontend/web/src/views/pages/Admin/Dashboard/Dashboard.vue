@@ -2,10 +2,10 @@
 import { useApp } from '@/app/app.ts'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useStatsStore } from '@/stores/stats_store.ts'
-import DashboardStatCard from '@/views/pages/Admin/Dashboard/DashboardStatCard.vue'
 import { useUserStore } from '@/stores/user_store.ts'
 import { DateTime } from '@/app/core/date_time.ts'
 import { useSetupStore } from '@/stores/setup_store.ts'
+import DashboardStatCard from '@/views/pages/Admin/Dashboard/DashboardStatCard.vue'
 
 const app = useApp()
 
@@ -54,7 +54,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="dashboard-page">
     <div class="row">
-      <div class="col-12 col-md-6 col-xl-8 mb-6 order-0">
+      <div class="col-12 col-md-6 col-xl-5 mb-6 order-0">
         <div class="card h-100">
           <div class="d-flex align-items-start row">
             <div class="col-sm-9">
@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-6 col-xl-4 mb-6 order-0">
+      <div class="col-12 col-md-6 col-xl-7 mb-6 order-0">
         <div class="card h-100"></div>
       </div>
     </div>
