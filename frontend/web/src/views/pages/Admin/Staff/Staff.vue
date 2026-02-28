@@ -5,8 +5,14 @@ import { useUsersStore } from '@/stores/users_store.ts'
 import { useApp } from '@/app/app.ts'
 import Preloader from '@/views/shared/components/Preloader.vue'
 import type { UserModel } from '@/app/models/user_model.ts'
+import { useRouter } from 'vue-router'
+
+defineOptions({
+  name: 'AdminStaffPage',
+})
 
 const app = useApp()
+const router = useRouter()
 const usersStore = useUsersStore()
 
 const users = computed(() => usersStore.get().value)
@@ -112,6 +118,15 @@ onMounted(async () => {
           style="height: 40px !important"
           class="btn btn-outline-primary d-flex justify-content-center"
           :disabled="isFetching"
+          @click="router.push({ name: 'admin:staff:add' })">
+          <i class="bx bx-plus" />
+          <span class="d-none d-sm-inline ms-2">Add Staff User</span>
+        </button>
+
+        <button
+          style="height: 40px !important"
+          class="btn btn-outline-primary d-flex justify-content-center ms-4"
+          :disabled="isFetching"
           @click="handleTableScrollEnd">
           <i class="bx bx-refresh" />
           <span class="d-none d-sm-inline ms-2">Refresh</span>
@@ -164,6 +179,7 @@ onMounted(async () => {
       </div>
     </template>
   </div>
+  <router-view />
 </template>
 
 <style scoped></style>

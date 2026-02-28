@@ -13,6 +13,7 @@ import type { PrivateApiClient } from '@/app/core/client.ts'
 import { UsersService } from '@/app/services/users_service'
 import { TeamsService } from '@/app/services/teams_service'
 import { TasksService } from '@/app/services/tasks_service'
+import { InventoryMovementsService } from '@/app/services/inventory_movements_service'
 
 class App {
   public readonly api: IApiClient
@@ -41,6 +42,7 @@ class App {
       users: new UsersService(ctx),
       teams: new TeamsService(ctx),
       tasks: new TasksService(ctx),
+      inventoryMovements: new InventoryMovementsService(ctx),
     }
   }
 }
@@ -70,4 +72,5 @@ interface IServices {
   users: UsersService
   teams: TeamsService
   tasks: TasksService
+  inventoryMovements: InventoryMovementsService
 }

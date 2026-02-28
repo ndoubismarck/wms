@@ -1,5 +1,6 @@
 import Dashboard from '@/views/pages/Admin/Dashboard/Dashboard.vue'
 import Staff from '@/views/pages/Admin/Staff/Staff.vue'
+import AddStaff from '@/views/pages/Admin/Staff/AddStaff.vue'
 import Tasks from '@/views/pages/Admin/Tasks/Tasks.vue'
 import AddTask from '@/views/pages/Admin/Tasks/AddTask.vue'
 import Teams from '@/views/pages/Admin/Teams/Teams.vue'
@@ -52,6 +53,17 @@ export default [
       breadcrumb: ['admin:staff'],
     },
     component: Staff,
+    children: [
+      {
+        path: '/admin/staff/add',
+        name: 'admin:staff:add',
+        meta: {
+          title: 'Add Staff User',
+          breadcrumb: ['admin:staff'],
+        },
+        component: AddStaff,
+      },
+    ],
   },
   {
     path: '/admin/tasks',
