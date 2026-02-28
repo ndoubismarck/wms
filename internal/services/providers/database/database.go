@@ -74,6 +74,24 @@ func (p *Provider) migrate() error {
 	if err := p.conn.AutoMigrate(&entities.User{}); err != nil {
 		return err
 	}
+	if err := p.conn.AutoMigrate(&entities.Location{}); err != nil {
+		return err
+	}
+	if err := p.conn.AutoMigrate(&entities.Team{}); err != nil {
+		return err
+	}
+	if err := p.conn.AutoMigrate(&entities.Task{}); err != nil {
+		return err
+	}
+	if err := p.conn.AutoMigrate(&entities.TeamMember{}); err != nil {
+		return err
+	}
+	if err := p.conn.AutoMigrate(&entities.TaskUserAssignment{}); err != nil {
+		return err
+	}
+	if err := p.conn.AutoMigrate(&entities.TaskTeamAssignment{}); err != nil {
+		return err
+	}
 	if err := p.conn.AutoMigrate(&entities.Product{}); err != nil {
 		return err
 	}
@@ -99,9 +117,6 @@ func (p *Provider) migrate() error {
 		return err
 	}
 	if err := p.conn.AutoMigrate(&entities.ProductAttributeOption{}); err != nil {
-		return err
-	}
-	if err := p.conn.AutoMigrate(&entities.Location{}); err != nil {
 		return err
 	}
 	if err := p.conn.AutoMigrate(&entities.LocationAisle{}); err != nil {

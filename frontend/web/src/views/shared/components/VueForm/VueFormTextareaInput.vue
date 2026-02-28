@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref, toRef } from 'vue'
-import { ErrorMessage as VeeErrorMessage, Field as VeeField } from 'vee-validate'
-import { useApp } from '@/app/app'
+import {onMounted, ref, toRef} from 'vue'
+import {ErrorMessage as VeeErrorMessage, Field as VeeField} from 'vee-validate'
+import {useApp} from '@/app/app'
 
 const props = defineProps<{
   name: string
-  hint?: string
   rules?: string
   label: string
   value?: string
@@ -18,7 +17,6 @@ const app = useApp()
 const model = ref<string>('')
 
 const name = toRef(props, 'name')
-const hint = toRef(props, 'hint')
 const label = toRef(props, 'label')
 const rules = toRef(props, 'rules')
 const value = toRef(props, 'value')
@@ -32,20 +30,21 @@ onMounted(async () => {
 </script>
 
 <template>
-  <small v-if="hint" class="text-muted d-block">{{ hint }}</small>
   <vee-field v-slot="{ field, meta }" :name="name" :rules="rules" v-model="model">
-    <div class="form-floating">
+    <div class="form-control-fi">
       <textarea
         v-bind="field"
         :disabled="disabled"
         :placeholder="placeholder"
         class="form-control"
         style="min-height: 100px"
-        :class="{ 'is-invalid': meta.validated && !meta.valid }" />
+        :class="{ 'is-invalid': meta.validated && !meta.valid }"/>
       <label>{{ label }}</label>
     </div>
   </vee-field>
   <vee-error-message v-slot="{ message }" :name="name">
-    <p class="invalid-feedback d-block p-0 m-0">{{ app.helpers.veeValidate.errorMessage(message) }}</p>
+    <p class="invalid-feedback d-block p-0 m-0">{{
+        app.helpers.veeValidate.errorMessage(message)
+      }}</p>
   </vee-error-message>
 </template>

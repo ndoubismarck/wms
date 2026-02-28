@@ -10,6 +10,11 @@ import (
 type Query struct {
 	users                       *queries.Users
 	locations                   *queries.Locations
+	teams                       *queries.Teams
+	teamMembers                 *queries.TeamMembers
+	tasks                       *queries.Tasks
+	taskUserAssignments         *queries.TaskUserAssignments
+	taskTeamAssignments         *queries.TaskTeamAssignments
 	products                    *queries.Products
 	productVariants             *queries.ProductVariants
 	productVariantMedia         *queries.ProductVariantMedia
@@ -32,6 +37,11 @@ func newQuery(ctx types.IContext, conn *gorm.DB, dialect types.Dialect) *Query {
 	return &Query{
 		users:                       queries.NewUsers(ctx, conn, dialect),
 		locations:                   queries.NewLocations(ctx, conn, dialect),
+		teams:                       queries.NewTeams(ctx, conn, dialect),
+		teamMembers:                 queries.NewTeamMembers(ctx, conn, dialect),
+		tasks:                       queries.NewTasks(ctx, conn, dialect),
+		taskUserAssignments:         queries.NewTaskUserAssignments(ctx, conn, dialect),
+		taskTeamAssignments:         queries.NewTaskTeamAssignments(ctx, conn, dialect),
 		products:                    queries.NewProducts(ctx, conn, dialect),
 		productVariants:             queries.NewProductVariants(ctx, conn, dialect),
 		productVariantMedia:         queries.NewProductVariantMedia(ctx, conn, dialect),
@@ -57,6 +67,26 @@ func (q *Query) Users() *queries.Users {
 
 func (q *Query) Locations() *queries.Locations {
 	return q.locations
+}
+
+func (q *Query) Teams() *queries.Teams {
+	return q.teams
+}
+
+func (q *Query) TeamMembers() *queries.TeamMembers {
+	return q.teamMembers
+}
+
+func (q *Query) Tasks() *queries.Tasks {
+	return q.tasks
+}
+
+func (q *Query) TaskUserAssignments() *queries.TaskUserAssignments {
+	return q.taskUserAssignments
+}
+
+func (q *Query) TaskTeamAssignments() *queries.TaskTeamAssignments {
+	return q.taskTeamAssignments
 }
 
 func (q *Query) Products() *queries.Products {

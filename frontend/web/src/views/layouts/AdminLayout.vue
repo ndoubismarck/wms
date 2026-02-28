@@ -75,8 +75,8 @@ const routeName = computed(() => route.name as string)
           :class="{
             'active open':
               routeName.startsWith('admin:staff') ||
-              routeName.startsWith('admin:roles') ||
-              routeName.startsWith('admin:tasks'),
+              routeName.startsWith('admin:tasks') ||
+              routeName.startsWith('admin:teams'),
           }">
           <div class="menu-link menu-toggle cursor-pointer">
             <i class="menu-icon tf-icons bx bx-user"></i>
@@ -88,14 +88,14 @@ const routeName = computed(() => route.name as string)
                 <div class="text-truncate">Staff</div>
               </router-link>
             </li>
-            <li class="menu-item" :class="{ active: routeName.startsWith('admin:roles') }">
-              <router-link :to="{ name: 'admin:roles' }" class="menu-link">
-                <div class="text-truncate">Roles</div>
-              </router-link>
-            </li>
             <li class="menu-item" :class="{ active: routeName.startsWith('admin:tasks') }">
               <router-link :to="{ name: 'admin:tasks' }" class="menu-link">
                 <div class="text-truncate">Tasks</div>
+              </router-link>
+            </li>
+            <li class="menu-item" :class="{ active: routeName.startsWith('admin:teams') }">
+              <router-link :to="{ name: 'admin:teams' }" class="menu-link">
+                <div class="text-truncate">Teams</div>
               </router-link>
             </li>
           </ul>

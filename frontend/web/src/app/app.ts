@@ -11,6 +11,8 @@ import { StatsService } from '@/app/services/stats_service'
 import { VeeValidateHelper } from '@/app/helpers/vee-validate.ts'
 import type { PrivateApiClient } from '@/app/core/client.ts'
 import { UsersService } from '@/app/services/users_service'
+import { TeamsService } from '@/app/services/teams_service'
+import { TasksService } from '@/app/services/tasks_service'
 
 class App {
   public readonly api: IApiClient
@@ -37,6 +39,8 @@ class App {
       products: new ProductsService(ctx),
       locations: new LocationsService(ctx),
       users: new UsersService(ctx),
+      teams: new TeamsService(ctx),
+      tasks: new TasksService(ctx),
     }
   }
 }
@@ -64,4 +68,6 @@ interface IServices {
   products: ProductsService
   locations: LocationsService
   users: UsersService
+  teams: TeamsService
+  tasks: TasksService
 }

@@ -23,7 +23,7 @@
   padding: 0 0.25rem;
   line-height: 1;
   color: var(--bs-secondary-color, #6c757d);
-  background: var(--bs-body-bg, #fff);
+  background: var(--bs-card-bg, #fff);
   pointer-events: none;
   transition: 150ms ease;
 }
@@ -110,4 +110,8 @@
 
 .borderless button {
   border: none;
+}
+
+.dropdown-menu {
+  z-index: 9999 !important;
 }

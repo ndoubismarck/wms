@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useProductsStore } from '@/stores/products_store.ts'
-import VueTable, { type ITableColumn } from '@/views/shared/components/VueTable.vue'
-import { useApp } from '@/app/app.ts'
+import {computed, onMounted, ref} from 'vue'
+import {useProductsStore} from '@/stores/products_store.ts'
+import VueTable, {type ITableColumn} from '@/views/shared/components/VueTable.vue'
+import {useApp} from '@/app/app.ts'
 import Preloader from '@/views/shared/components/Preloader.vue'
-import type { ProductModel } from '@/app/models/product_model.ts'
-import { useRouter } from 'vue-router'
+import type {ProductModel} from '@/app/models/product_model.ts'
+import {useRouter} from 'vue-router'
 
 const app = useApp()
 const router = useRouter()
@@ -117,16 +117,16 @@ onMounted(async () => {
   <div class="card">
     <template v-if="isLoading">
       <div class="card-body position-relative h-px-300">
-        <preloader :overlay="true" />
+        <preloader :overlay="true"/>
       </div>
     </template>
     <template v-else>
-      <div class="card-header d-flex justify-content-start">
+      <div class="card-header d-flex justify-content-start border-bottom">
         <button
           style="height: 40px !important"
           @click="router.push({ name: 'admin:inventory:products:add' })"
           class="btn btn-outline-primary d-flex justify-content-center">
-          <i class="bx bx-plus" />
+          <i class="bx bx-plus"/>
           <span class="d-none d-sm-inline ms-2">Add Product</span>
         </button>
         <div class="dropdown ms-4">
@@ -138,24 +138,26 @@ onMounted(async () => {
             aria-expanded="false"
             :disabled="checkedProductIds.length == 0">
             <span class="d-none d-sm-inline me-2">With Selected</span>
-            <i class="bx bx-chevron-down" />
+            <i class="bx bx-chevron-down"/>
           </button>
           <ul class="dropdown-menu">
             <li>
               <a href="#" class="dropdown-item text-primary">
-                <div class="d-flex justify-content-start"><i class="bx bx-download me-2"></i><span>Export</span></div>
+                <div class="d-flex justify-content-start"><i class="bx bx-download me-2"></i><span>Export</span>
+                </div>
               </a>
             </li>
             <li>
               <a href="#" class="dropdown-item text-danger">
-                <div class="d-flex justify-content-start"><i class="bx bx-trash me-2"></i><span>Delete</span></div>
+                <div class="d-flex justify-content-start"><i class="bx bx-trash me-2"></i><span>Delete</span>
+                </div>
               </a>
             </li>
           </ul>
         </div>
       </div>
 
-      <div class="card-body p-0" style="min-height: 300px">
+      <div class="card-body p-0">
         <vue-table
           :rows="products"
           :columns="getTableColumns"
@@ -171,12 +173,12 @@ onMounted(async () => {
           </template>
           <template #preloader>
             <div v-if="isFetching" class="position-relative h-auto py-6 my-6">
-              <preloader :overlay="true" />
+              <preloader :overlay="true"/>
             </div>
           </template>
         </vue-table>
       </div>
     </template>
   </div>
-  <router-view />
+  <router-view/>
 </template>

@@ -1,7 +1,8 @@
 import Dashboard from '@/views/pages/Admin/Dashboard/Dashboard.vue'
 import Staff from '@/views/pages/Admin/Staff/Staff.vue'
-import Roles from '@/views/pages/Admin/Roles/Roles.vue'
 import Tasks from '@/views/pages/Admin/Tasks/Tasks.vue'
+import AddTask from '@/views/pages/Admin/Tasks/AddTask.vue'
+import Teams from '@/views/pages/Admin/Teams/Teams.vue'
 import Inventory from '@/views/pages/Admin/Inventory/Inventory.vue'
 import InventoryMovements from '@/views/pages/Admin/Inventory/Movements.vue'
 import ProductDetails from '@/views/pages/Admin/Inventory/ProductDetails.vue'
@@ -53,15 +54,6 @@ export default [
     component: Staff,
   },
   {
-    path: '/admin/roles',
-    name: 'admin:roles',
-    meta: {
-      title: 'Roles',
-      breadcrumb: ['admin:roles'],
-    },
-    component: Roles,
-  },
-  {
     path: '/admin/tasks',
     name: 'admin:tasks',
     meta: {
@@ -69,6 +61,26 @@ export default [
       breadcrumb: ['admin:tasks'],
     },
     component: Tasks,
+    children: [
+      {
+        path: '/admin/tasks/add',
+        name: 'admin:tasks:add',
+        meta: {
+          title: 'Add Task',
+          breadcrumb: ['admin:tasks'],
+        },
+        component: AddTask,
+      },
+    ],
+  },
+  {
+    path: '/admin/teams',
+    name: 'admin:teams',
+    meta: {
+      title: 'Teams',
+      breadcrumb: ['admin:teams'],
+    },
+    component: Teams,
   },
   {
     path: '/admin/inventory/products',

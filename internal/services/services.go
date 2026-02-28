@@ -9,6 +9,8 @@ import (
 	"server/internal/services/core/products"
 	"server/internal/services/core/setup"
 	"server/internal/services/core/stats"
+	"server/internal/services/core/tasks"
+	"server/internal/services/core/teams"
 	"server/internal/services/core/users"
 	"server/internal/services/providers"
 )
@@ -22,6 +24,8 @@ type Services struct {
 	locations *locations.Service
 	inventory *inventory.Service
 	users     *users.Service
+	teams     *teams.Service
+	tasks     *tasks.Service
 }
 
 func New(ctx types.IContext, providers *providers.Providers) *Services {
@@ -34,6 +38,8 @@ func New(ctx types.IContext, providers *providers.Providers) *Services {
 		locations: locations.New(ctx, providers),
 		inventory: inventory.New(ctx, providers),
 		users:     users.New(ctx, providers),
+		teams:     teams.New(ctx, providers),
+		tasks:     tasks.New(ctx, providers),
 	}
 }
 
@@ -67,4 +73,12 @@ func (s *Services) Inventory() *inventory.Service {
 
 func (s *Services) Users() *users.Service {
 	return s.users
+}
+
+func (s *Services) Teams() *teams.Service {
+	return s.teams
+}
+
+func (s *Services) Tasks() *tasks.Service {
+	return s.tasks
 }

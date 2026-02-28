@@ -45,6 +45,13 @@ const removeValueDuplicates = (value: undefined | number[] | string[]): number[]
   return Array.from(new Set(value as any[]))
 }
 
+const getLabel = (value: any): string => {
+  if (typeof value == 'string' && value.length > 0) {
+    return `${value.charAt(0).toUpperCase()}${value.slice(1)}`
+  }
+  return `${value ?? ''}`
+}
+
 watch(value, () => {
   model.value = Array.from(new Set(removeValueDuplicates(value.value) as any[]))
 })
@@ -77,11 +84,11 @@ onBeforeUnmount(() => {
                 type="checkbox"
                 class="form-check-input"
                 :class="{ 'is-invalid': meta.touched && !meta.valid }"
-                :id="`dropdown-checkbox-${name}-${item.value.key}`" />
+                :id="`dropdown-checkbox-${name}-${item.key}`" />
             </vee-field>
           </div>
-          <label class="form-check-label" :for="`dropdown-checkbox-${name}-${item.value.key}`">
-            {{ `${item.value.charAt(0).toUpperCase()}${item.value.slice(1)}` }}
+          <label class="form-check-label" :for="`dropdown-checkbox-${name}-${item.key}`">
+            {{ getLabel(item.value) }}
           </label>
         </div>
       </div>
