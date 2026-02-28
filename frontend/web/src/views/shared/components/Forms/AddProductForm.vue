@@ -92,7 +92,7 @@ const alert = ref<IAlertMessage | null>(null)
 const isLoading = ref<boolean>(true)
 const isSubmitting = ref<boolean>(false)
 
-const formData = ref<VueFormData>()
+const formData = ref<VueFormData>({})
 const accordionWizardRef = ref<typeof VueAccordionWizard>()
 
 const productBrandOptions = ref<ISelectInputOption[]>([])
@@ -143,7 +143,7 @@ const getAttributeInputName = (item: ProductAttributeModel): string => {
     multi_check: 'options',
   }
   const dataType = dataTypeByFieldType[item.fieldType] || 'string'
-  return `attributes.${attributeID}.${dataType}`
+  return `variant.attributes.${attributeID}.${dataType}`
 }
 
 const getAttributeValidation = (item: ProductAttributeModel): string | undefined => {
@@ -356,6 +356,25 @@ const reset = () => {
   if (form.value) {
     form.value.reset()
   }
+  formData.value = {}
+}
+
+const isObject = (value: unknown): value is Record<string, any> => {
+  return typeof value == 'object' && value != null && !Array.isArray(value)
+}
+
+const mergeValues = (target: VueFormData, source: VueFormData): VueFormData => {
+  const output: VueFormData = { ...target }
+  Object.keys(source).forEach((key) => {
+    const nextValue = source[key]
+    const currentValue = output[key]
+    if (isObject(currentValue) && isObject(nextValue)) {
+      output[key] = mergeValues(currentValue, nextValue)
+    } else {
+      output[key] = nextValue
+    }
+  })
+  return output
 }
 
 const loadOptions = (source: UnwrapRef<any>, options: UnwrapRef<any>, selected: UnwrapRef<any>) => {
@@ -377,33 +396,38 @@ const loadOptions = (source: UnwrapRef<any>, options: UnwrapRef<any>, selected: 
 }
 
 const handleNext = async (data: VueFormData) => {
-  Object.keys(data).forEach((key) => {
-    if (!formData.value) {
-      formData.value = {}
-    }
-    formData.value[key] = data[key]
-  })
+  formData.value = mergeValues(formData.value, data)
   if (accordionWizardRef.value) {
     if (accordionWizardRef.value.hasNext()) {
       accordionWizardRef.value.next()
     }
   }
-  console.log(data)
 }
 
-const handleSubmit = async (data: VueFormData) => {
-  return
+const handleSubmit = async () => {
   emits('submit')
   isSubmitting.value = true
   let success = false
   let payload: ProductModel | undefined
   try {
+    const data = mergeValues({}, formData.value)
+    if (!isObject(data.variant)) {
+      data.variant = {}
+    }
+    if (!Array.isArray(data.variant.images)) {
+      data.variant.images = []
+    }
+    if (!isObject(data.variant.attributes)) {
+      data.variant.attributes = {}
+    }
+    data.variant.quantity_on_hand = Math.max(0, Number(data.variant.quantity_on_hand ?? 0))
+
     const result = await app.services.products.add(data)
-    await app.helpers.async.sleep(2000)
     if (result.success) {
       success = true
       payload = result.product
       form.value?.reset()
+      formData.value = {}
       alert.value = {
         type: EAlertMessageType.Success,
         body: {
@@ -729,7 +753,6 @@ onMounted(async () => {
   await getProductBrands()
   await getProductAttributes()
   await getLocationAisles()
-  await app.helpers.async.sleep(3000)
   isLoading.value = false
 })
 
@@ -832,8 +855,16 @@ onBeforeUnmount(() => {
         <button type="submit" class="btn btn-outline-primary">Next</button>
       </vue-form>
     </vue-accordion-wizard-item>
-    <vue-accordion-wizard-item title="Product Details">
+    <vue-accordion-wizard-item title="Variant Details">
       <vue-form ref="form" @submit="handleNext">
+        <div class="mb-6">
+          <vue-form-input
+            name="variant.quantity_on_hand"
+            label="Initial Quantity"
+            :disabled="isSubmitting"
+            placeholder="0"
+            type="number"/>
+        </div>
         <div v-for="item in productAttributes" :key="getAttributeID(item)" class="mb-6">
           <template v-if="item.fieldType === 'textarea'">
             <vue-form-textarea-input
@@ -900,7 +931,7 @@ onBeforeUnmount(() => {
         </div>
       </vue-form>
     </vue-accordion-wizard-item>
-    <vue-accordion-wizard-item title="Product Media">
+    <vue-accordion-wizard-item title="Variant Media">
       <vue-form ref="form" @submit="handleNext">
         <div class="mb-6">
           <vue-form-file-input

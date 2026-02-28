@@ -20,15 +20,25 @@ type (
 )
 
 type (
+	addVariantData struct {
+		QuantityOnHand uint64               `json:"quantity_on_hand"`
+		Images         []string             `json:"images"`
+		Attributes     map[string]attribute `json:"attributes"`
+	}
+)
+
+type (
 	AddData struct {
-		BinID         string               `json:"bin_id"`
-		BrandID       string               `json:"brand_id"`
-		LocationID    string               `json:"-" validate:"required"`
-		SubcategoryID string               `json:"subcategory_id"`
-		Name          string               `json:"name"`
-		Description   string               `json:"description"`
-		Images        []string             `json:"images"`
-		Attributes    map[string]attribute `json:"attributes"`
+		BinID          string               `json:"bin_id"`
+		BrandID        string               `json:"brand_id"`
+		LocationID     string               `json:"-" validate:"required"`
+		SubcategoryID  string               `json:"subcategory_id"`
+		Name           string               `json:"name"`
+		Description    string               `json:"description"`
+		Variant        addVariantData       `json:"variant"`
+		QuantityOnHand uint64               `json:"quantity_on_hand,omitempty"`
+		Images         []string             `json:"images"`
+		Attributes     map[string]attribute `json:"attributes"`
 	}
 	AddResult struct {
 		Code       types.ServiceResultCode

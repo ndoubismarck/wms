@@ -218,6 +218,28 @@ func (s *Service) deleteProcessedImages(images []entities.ProductVariantMedia) {
 	}
 }
 
+func (s *Service) resolveAddVariantData(data AddData) (uint64, []string, map[string]attribute) {
+	quantityOnHand := data.QuantityOnHand
+	if data.Variant.QuantityOnHand > 0 {
+		quantityOnHand = data.Variant.QuantityOnHand
+	}
+
+	images := data.Images
+	if len(data.Variant.Images) > 0 {
+		images = data.Variant.Images
+	}
+
+	attributes := data.Attributes
+	if len(data.Variant.Attributes) > 0 {
+		attributes = data.Variant.Attributes
+	}
+	if attributes == nil {
+		attributes = map[string]attribute{}
+	}
+
+	return quantityOnHand, images, attributes
+}
+
 func (s *Service) Add(data AddData) (*AddResult, error) {
 	vld, ok, err := s.providers.Validation().ValidateStruct(data)
 	if err != nil {
@@ -233,23 +255,50 @@ func (s *Service) Add(data AddData) (*AddResult, error) {
 	if !ok {
 		return &AddResult{Code: types.ServiceResultCodeFailed}, nil
 	}
-	images, err := s.processUploadedImages(data.Images)
-	if err != nil {
-		return nil, err
+
+	quantityOnHand, imageUploads, attributeValues := s.resolveAddVariantData(data)
+	binID := strings.TrimSpace(data.BinID)
+	if quantityOnHand > 0 && binID == "" {
+		return &AddResult{
+			Code:       types.ServiceResultCodeInvalid,
+			Validation: types.ValidationResult{"bin_id": {"required when quantity_on_hand is greater than zero"}},
+		}, nil
 	}
-	var variants []entities.ProductVariant
-	if len(images) > 0 {
-		variants = append(variants, entities.ProductVariant{
-			Media: images,
+	if binID != "" {
+		exists, err := query.LocationBins().Exists(queries.LocationBinsParams{
+			ID:         &binID,
+			LocationID: &data.LocationID,
 		})
+		if err != nil {
+			return nil, err
+		}
+		if !exists {
+			return &AddResult{
+				Code:       types.ServiceResultCodeInvalid,
+				Validation: types.ValidationResult{"bin_id": {"invalid value"}},
+			}, nil
+		}
 	}
+
+	images := []entities.ProductVariantMedia{}
+	if len(imageUploads) > 0 {
+		images, err = s.processUploadedImages(imageUploads)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	variants := []entities.ProductVariant{{
+		Attributes: s.getAttributes(attributeValues),
+		Media:      images,
+	}}
+
 	product, err := query.Products().Create(entities.Product{
 		LocationD:     data.LocationID,
 		SubcategoryID: data.SubcategoryID,
 		BrandID:       data.BrandID,
 		Name:          data.Name,
 		Status:        entities.ProductStatusAvailable,
-		Attributes:    s.getAttributes(data.Attributes),
 		Description:   data.Description,
 		Variants:      variants,
 	})
@@ -257,7 +306,26 @@ func (s *Service) Add(data AddData) (*AddResult, error) {
 		s.deleteProcessedImages(images)
 		return nil, err
 	}
-	s.deleteUploadedImages(data.Images)
+
+	if binID != "" && len(product.Variants) > 0 {
+		variantID := product.Variants[0].ID
+		if variantID != "" {
+			if _, err := query.Inventory().Create(entities.Inventory{
+				BinID:          binID,
+				VariantID:      variantID,
+				QuantityOnHand: quantityOnHand,
+			}); err != nil {
+				_, _ = query.Products().Delete(queries.ProductParams{
+					ID:         &product.ID,
+					LocationID: &data.LocationID,
+				})
+				s.deleteProcessedImages(images)
+				return nil, err
+			}
+		}
+	}
+
+	s.deleteUploadedImages(imageUploads)
 	return &AddResult{
 		Code: types.ServiceResultCodeSuccess,
 		Payload: AddResultPayload{
