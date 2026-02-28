@@ -32,7 +32,7 @@ export class AuthService extends AppService {
   }
 
   public async getMe(): Promise<IGetUserResult> {
-    let path = `/me`
+    const path = `/me`
     const response = await this.api.private.get(path, true)
     return {
       user: new UserModel(response.body['data']['user']),

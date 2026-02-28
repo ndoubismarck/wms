@@ -125,7 +125,7 @@ export class PrivateApiClient {
     if (token == null) {
       return null
     }
-    let val = token.split('.')[1]
+    const val = token.split('.')[1]
     let data = {
       id: null,
       iat: null,

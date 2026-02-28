@@ -121,7 +121,7 @@ func (q *InventoryMovements) FindMany(params InventoryMovementsParams, paginatio
 	}
 	paginationResult := pagination.GetResult(count)
 	if err := query.
-		Order(pagination.GetOrder()).
+		Order(pagination.GetOrderWithPrefix("inventory_movements")).
 		Limit(pagination.GetLimit()).
 		Offset(pagination.GetOffset()).
 		Find(&results).Error; err != nil {

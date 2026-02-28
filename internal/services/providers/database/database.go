@@ -77,6 +77,18 @@ func (p *Provider) migrate() error {
 	if err := p.conn.AutoMigrate(&entities.Location{}); err != nil {
 		return err
 	}
+	if err := p.conn.AutoMigrate(&entities.Customer{}); err != nil {
+		return err
+	}
+	if err := p.conn.AutoMigrate(&entities.Supplier{}); err != nil {
+		return err
+	}
+	if err := p.conn.AutoMigrate(&entities.Order{}); err != nil {
+		return err
+	}
+	if err := p.conn.AutoMigrate(&entities.Shipment{}); err != nil {
+		return err
+	}
 	if err := p.conn.AutoMigrate(&entities.Team{}); err != nil {
 		return err
 	}

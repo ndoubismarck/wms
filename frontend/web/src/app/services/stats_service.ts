@@ -9,7 +9,7 @@ export class StatsService extends AppService {
   }
 
   public async get(lid: string): Promise<IGetSetupResult> {
-    let path = `/${lid}/stats`
+    const path = `/${lid}/stats`
     const response = await this.api.private.get(path, true)
     return {
       stats: new StatsModel(response.body['data']['stats']),

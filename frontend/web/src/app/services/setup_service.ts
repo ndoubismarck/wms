@@ -9,7 +9,7 @@ export class SetupService extends AppService {
   }
 
   public async get(): Promise<IGetSetupResult> {
-    let path = `/setup`
+    const path = `/setup`
     const response = await this.api.private.get(path, true)
     const model = new SetupModel(response.body['data']['setup'])
     if (model.location.id) {

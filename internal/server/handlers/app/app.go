@@ -145,6 +145,26 @@ func Setup(ctx types.IContext, engine *gin.Engine, services *services.Services, 
 	router.GET("/:lid/inventory/:id", mw.setup, mw.auth, h.getInventoryItem)
 	router.DELETE("/:lid/inventory/:id", mw.setup, mw.auth, h.deleteInventory)
 
+	router.GET("/:lid/operations/orders", mw.setup, mw.auth, h.getOrders)
+	router.POST("/:lid/operations/orders", mw.setup, mw.auth, mw.admin, h.addOrder)
+	router.PUT("/:lid/operations/orders/:id", mw.setup, mw.auth, mw.admin, h.updateOrder)
+	router.DELETE("/:lid/operations/orders/:id", mw.setup, mw.auth, mw.admin, h.deleteOrder)
+
+	router.GET("/:lid/operations/shipments", mw.setup, mw.auth, h.getShipments)
+	router.POST("/:lid/operations/shipments", mw.setup, mw.auth, mw.admin, h.addShipment)
+	router.PUT("/:lid/operations/shipments/:id", mw.setup, mw.auth, mw.admin, h.updateShipment)
+	router.DELETE("/:lid/operations/shipments/:id", mw.setup, mw.auth, mw.admin, h.deleteShipment)
+
+	router.GET("/:lid/operations/customers", mw.setup, mw.auth, h.getCustomers)
+	router.POST("/:lid/operations/customers", mw.setup, mw.auth, mw.admin, h.addCustomer)
+	router.PUT("/:lid/operations/customers/:id", mw.setup, mw.auth, mw.admin, h.updateCustomer)
+	router.DELETE("/:lid/operations/customers/:id", mw.setup, mw.auth, mw.admin, h.deleteCustomer)
+
+	router.GET("/:lid/operations/suppliers", mw.setup, mw.auth, h.getSuppliers)
+	router.POST("/:lid/operations/suppliers", mw.setup, mw.auth, mw.admin, h.addSupplier)
+	router.PUT("/:lid/operations/suppliers/:id", mw.setup, mw.auth, mw.admin, h.updateSupplier)
+	router.DELETE("/:lid/operations/suppliers/:id", mw.setup, mw.auth, mw.admin, h.deleteSupplier)
+
 	go func(eventsChan chan *types.ServerEvent) {
 		for event := range eventsChan {
 			h.helpers.SSE().Publish(event)

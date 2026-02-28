@@ -6,6 +6,7 @@ import (
 	"server/internal/services/core/files"
 	"server/internal/services/core/inventory"
 	"server/internal/services/core/locations"
+	"server/internal/services/core/operations"
 	"server/internal/services/core/products"
 	"server/internal/services/core/setup"
 	"server/internal/services/core/stats"
@@ -16,30 +17,32 @@ import (
 )
 
 type Services struct {
-	auth      *auth.Service
-	setup     *setup.Service
-	stats     *stats.Service
-	files     *files.Service
-	products  *products.Service
-	locations *locations.Service
-	inventory *inventory.Service
-	users     *users.Service
-	teams     *teams.Service
-	tasks     *tasks.Service
+	auth       *auth.Service
+	setup      *setup.Service
+	stats      *stats.Service
+	files      *files.Service
+	products   *products.Service
+	locations  *locations.Service
+	inventory  *inventory.Service
+	users      *users.Service
+	teams      *teams.Service
+	tasks      *tasks.Service
+	operations *operations.Service
 }
 
 func New(ctx types.IContext, providers *providers.Providers) *Services {
 	return &Services{
-		auth:      auth.New(ctx, providers),
-		setup:     setup.New(ctx, providers),
-		stats:     stats.New(ctx, providers),
-		files:     files.New(ctx, providers),
-		products:  products.New(ctx, providers),
-		locations: locations.New(ctx, providers),
-		inventory: inventory.New(ctx, providers),
-		users:     users.New(ctx, providers),
-		teams:     teams.New(ctx, providers),
-		tasks:     tasks.New(ctx, providers),
+		auth:       auth.New(ctx, providers),
+		setup:      setup.New(ctx, providers),
+		stats:      stats.New(ctx, providers),
+		files:      files.New(ctx, providers),
+		products:   products.New(ctx, providers),
+		locations:  locations.New(ctx, providers),
+		inventory:  inventory.New(ctx, providers),
+		users:      users.New(ctx, providers),
+		teams:      teams.New(ctx, providers),
+		tasks:      tasks.New(ctx, providers),
+		operations: operations.New(ctx, providers),
 	}
 }
 
@@ -81,4 +84,8 @@ func (s *Services) Teams() *teams.Service {
 
 func (s *Services) Tasks() *tasks.Service {
 	return s.tasks
+}
+
+func (s *Services) Operations() *operations.Service {
+	return s.operations
 }

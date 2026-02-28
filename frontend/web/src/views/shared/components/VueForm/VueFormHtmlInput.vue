@@ -44,7 +44,7 @@ watch(editorRef, () => {
     })
     quill.value.on('text-change', () => {
       if (quill.value) {
-        let innerHTML = quill.value.root.innerHTML
+        const innerHTML = quill.value.root.innerHTML
         //todo remove empty tags and any unwanted tags like <img>, <iframe>, <embed>, <script>..
         model.value = innerHTML
       }

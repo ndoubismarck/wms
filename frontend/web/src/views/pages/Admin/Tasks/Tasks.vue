@@ -143,9 +143,10 @@ const openAssignTask = () => {
   }
   const selectedTasks = tasks.value.filter((task) => checkedTaskIds.value.includes(task.id))
   if (selectedTasks.length == 1) {
+    const selectedTask = selectedTasks[0]
     assignTaskForm.value = {
-      userIds: [...selectedTasks[0]?.userIds],
-      teamIds: [...selectedTasks[0]?.teamIds],
+      userIds: selectedTask?.userIds ? [...selectedTask.userIds] : [],
+      teamIds: selectedTask?.teamIds ? [...selectedTask.teamIds] : [],
     }
   } else {
     assignTaskForm.value = {

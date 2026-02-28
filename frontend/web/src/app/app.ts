@@ -14,6 +14,7 @@ import { UsersService } from '@/app/services/users_service'
 import { TeamsService } from '@/app/services/teams_service'
 import { TasksService } from '@/app/services/tasks_service'
 import { InventoryMovementsService } from '@/app/services/inventory_movements_service'
+import { OperationsService } from '@/app/services/operations_service'
 
 class App {
   public readonly api: IApiClient
@@ -43,6 +44,7 @@ class App {
       teams: new TeamsService(ctx),
       tasks: new TasksService(ctx),
       inventoryMovements: new InventoryMovementsService(ctx),
+      operations: new OperationsService(ctx),
     }
   }
 }
@@ -73,4 +75,5 @@ interface IServices {
   teams: TeamsService
   tasks: TasksService
   inventoryMovements: InventoryMovementsService
+  operations: OperationsService
 }

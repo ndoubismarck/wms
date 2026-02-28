@@ -15,6 +15,10 @@ type Query struct {
 	tasks                       *queries.Tasks
 	taskUserAssignments         *queries.TaskUserAssignments
 	taskTeamAssignments         *queries.TaskTeamAssignments
+	orders                      *queries.Orders
+	shipments                   *queries.Shipments
+	customers                   *queries.Customers
+	suppliers                   *queries.Suppliers
 	products                    *queries.Products
 	productVariants             *queries.ProductVariants
 	productVariantMedia         *queries.ProductVariantMedia
@@ -42,6 +46,10 @@ func newQuery(ctx types.IContext, conn *gorm.DB, dialect types.Dialect) *Query {
 		tasks:                       queries.NewTasks(ctx, conn, dialect),
 		taskUserAssignments:         queries.NewTaskUserAssignments(ctx, conn, dialect),
 		taskTeamAssignments:         queries.NewTaskTeamAssignments(ctx, conn, dialect),
+		orders:                      queries.NewOrders(ctx, conn, dialect),
+		shipments:                   queries.NewShipments(ctx, conn, dialect),
+		customers:                   queries.NewCustomers(ctx, conn, dialect),
+		suppliers:                   queries.NewSuppliers(ctx, conn, dialect),
 		products:                    queries.NewProducts(ctx, conn, dialect),
 		productVariants:             queries.NewProductVariants(ctx, conn, dialect),
 		productVariantMedia:         queries.NewProductVariantMedia(ctx, conn, dialect),
@@ -79,6 +87,22 @@ func (q *Query) TeamMembers() *queries.TeamMembers {
 
 func (q *Query) Tasks() *queries.Tasks {
 	return q.tasks
+}
+
+func (q *Query) Orders() *queries.Orders {
+	return q.orders
+}
+
+func (q *Query) Shipments() *queries.Shipments {
+	return q.shipments
+}
+
+func (q *Query) Customers() *queries.Customers {
+	return q.customers
+}
+
+func (q *Query) Suppliers() *queries.Suppliers {
+	return q.suppliers
 }
 
 func (q *Query) TaskUserAssignments() *queries.TaskUserAssignments {
